@@ -6,8 +6,10 @@ Companion site to [r00ts-extension](https://github.com/al165/r00ts-extension).
 Developed by [Arran Lyon](https://arranlyon.com) and [AIxDESIGN](https://aixdesign.co).
 With support from [Stimulerings Fonds](https://www.stimuleringsfonds.nl/).
 
-![Svelte Badge](https://img.shields.io/badge/SvelteKit-FF3E00?style=for-the-badge&logo=Svelte&logoColor=white)
-![TypeScript Badge](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+[![MapLibre](https://img.shields.io/badge/MapLibre-396CB2?logo=MapLibre)](https://maplibre.org/)
+
+[![SvelteKit](https://img.shields.io/badge/SvelteKit-%23f1413d.svg?logo=svelte&logoColor=white)](#)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=fff)](#)
 
 ## Developing
 
