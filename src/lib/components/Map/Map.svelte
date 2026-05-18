@@ -33,7 +33,7 @@
     }: Props = $props();
 
     let debugGlyphSize = $state(glyphSize);
-    let debugShow = $state(true);
+    let debugShow = $state(false);
 
     let datacenterMarkers: maplibregl.Marker[] = [];
 

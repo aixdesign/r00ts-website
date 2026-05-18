@@ -12,17 +12,6 @@ export function colourDistSquared(a: Colour, b: Colour) {
 }
 
 
-/**
- * Sync movements of two maps.
- * 
- * All interactions that result in movement end up firing
- * a "move" event. The trick here, though, is to
- * ensure that movements don't cycle from one map
- * to the other and back again, because such a cycle
- * - could cause an infinite loop
- * - prematurely halts prolonged movements like
- *   double-click zooming, box-zooming, and flying
- */
 export function syncMaps(...maps: Map[]) {
     // Create all the movement functions, because if they're created every time
     // they wouldn't be the same and couldn't be removed.
