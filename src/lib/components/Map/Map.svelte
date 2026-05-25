@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { onDestroy, onMount } from "svelte";
+    import { unmount, onDestroy, onMount } from "svelte";
 
     import maplibregl from "maplibre-gl";
     import "maplibre-gl/dist/maplibre-gl.css";
@@ -13,6 +13,7 @@
     import { glyphState } from "./glyphState.svelte.ts";
     import type { DatacenterInfo, Props } from "./types.ts";
     import { colourToString } from "./utils.ts";
+    import { addMarker, clearActiveMarker } from "./marker.svelte.ts";
 
     let mapContainer: HTMLDivElement;
     let mapBuildingsContainer: HTMLDivElement;
@@ -35,31 +36,13 @@
     let debugGlyphSize = $state(glyphSize);
     let debugShow = $state(false);
 
-    let datacenterMarkers: maplibregl.Marker[] = [];
+    let datacenterMarkers: {
+        marker: maplibregl.Marker;
+        component: any;
+        zoomState: { value: number };
+    }[] = [];
 
     let rasteriser: MapRaseriser;
-
-    let selectedDatacenter: DatacenterInfo | null = $state(null);
-
-    function selectDatacenter(ds: DatacenterInfo, marker: maplibregl.Marker) {
-        if (selectedDatacenter && selectedDatacenter.marker)
-            selectedDatacenter.marker.removeClassName("datacenter-selected");
-
-        selectedDatacenter = ds;
-
-        if (!ds) {
-            // datacenterInfo.maxHeight = "0px";
-            return;
-        }
-
-        selectedDatacenter.marker = marker;
-        marker.addClassName("datacenter-selected");
-
-        map.flyTo({ zoom: 15, center: ds.geometry.coordinates });
-
-        // datacenterInfo.innerHTML = ds.properties.description;
-        // datacenterInfo.style.maxHeight = "80vh";
-    }
 
     onMount(() => {
         const mapBuildingsLayer: maplibregl.Map = new maplibregl.Map({
@@ -92,66 +75,50 @@
 
         map.on("render", () => {
             rasteriser.renderGlyphs();
-            // renderDatacenterLine();
         });
 
         map.on("load", () => {
-            map.on("zoomend", () => {
+            map.on("zoom", () => {
                 const zoom = map.getZoom();
 
-                if (zoom >= 10) {
-                    datacenterMarkers.forEach((el) =>
-                        el.removeClassName("datacenter-marker-small"),
-                    );
-                } else {
-                    datacenterMarkers.forEach((el) =>
-                        el.addClassName("datacenter-marker-small"),
-                    );
+                for (const { zoomState } of datacenterMarkers) {
+                    zoomState.value = zoom;
                 }
             });
 
             if (geoJSON) {
                 geoJSON.data.features.forEach((ds: DatacenterInfo) => {
-                    const { url } = ds.properties;
+                    const { url, id } = ds.properties;
                     const { coordinates } = ds.geometry;
 
-                    const el = document.createElement("div");
-                    el.className = "marker";
-                    el.classList.add("datacenter-marker");
-
-                    const aerial = document.createElement("div");
-                    aerial.classList.add("datacenter-aerial");
-                    aerial.style.backgroundImage = `url(${url})`;
-                    aerial.style.height = "100%";
-
-                    el.appendChild(aerial);
-
-                    if (map.getZoom() < 10)
-                        el.classList.add("datacenter-marker-small");
-
-                    const marker = new maplibregl.Marker({ element: el })
-                        .setLngLat(coordinates)
-                        .addTo(map);
-
-                    marker.on("click", () => {
-                        selectDatacenter(ds, marker);
-                    });
-                    datacenterMarkers.push(marker);
+                    datacenterMarkers.push(
+                        addMarker(map, {
+                            lat: coordinates[1],
+                            lng: coordinates[0],
+                            url,
+                            id,
+                        }),
+                    );
                 });
-
-                // map.flyTo({
-                //     zoom: 14,
-                //     center: geoJSON.data.features[0].geometry.coordinates,
-                // });
             }
 
             new ResizeObserver(() =>
                 rasteriser.resize(mapCanvas.width, mapCanvas.height),
             ).observe(mapCanvas);
         });
+
+        map.on("click", () => {
+            clearActiveMarker();
+        });
     });
 
-    onDestroy(() => map?.remove());
+    onDestroy(() => {
+        for (const { marker, component } of datacenterMarkers) {
+            marker.remove();
+            unmount(component);
+        }
+        map?.remove();
+    });
 </script>
 
 <div bind:this={mapBuildingsContainer} class="base-map map-overlay"></div>
@@ -243,32 +210,6 @@
 <style>
     .map-container {
         height: 100vh;
-    }
-
-    :global(.datacenter-marker) {
-        width: 200px;
-        height: 200px;
-        transition-property: width, height !important;
-        transition-duration: 1s !important;
-        padding: 0.8em;
-        z-index: 2;
-    }
-
-    :global(.datacenter-marker:hover) {
-        transform: scale(1.1);
-    }
-
-    :global(.datacenter-selected) {
-        border: 8px solid var(--info-bg);
-    }
-
-    :global(.datacenter-aerial) {
-        background-size: cover;
-    }
-
-    :global(.datacenter-marker-small) {
-        width: 50px;
-        height: 50px;
     }
 
     .map-overlay {

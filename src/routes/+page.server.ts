@@ -1,35 +1,38 @@
-import { fail, type Actions } from '@sveltejs/kit';
-
-import * as database from '$lib/server/database';
 
 export function load() {
-    return database.getArticles();
-}
-
-export const actions = {
-    default: async ({ request }) => {
-        const data = await request.formData();
-
-        const title = data.get('title');
-        const url = data.get('url');
-        let description = data.get('description');
-
-        if (!title)
-            return fail(400, { title, url, missing: 'title' });
-
-        if (!url)
-            return fail(400, { title, url, missing: 'url' });
-
-        if (!description)
-            description = "";
-        else
-            description = description.toString();
-
-        const result = database.addArticle(title.toString(), url.toString(), description);
-
-        if (!result.success)
-            return fail(500);
-
-        return result;
+    // TODO: load from database
+    const datacentersGeoJson = {
+        'type': 'geojson',
+        'data': {
+            'type': 'FeatureCollection',
+            'features': [
+                {
+                    'type': 'Feature',
+                    'properties': {
+                        'description': '<strong>A datacenter is here</strong>',
+                        'url': 'img1.png',
+                        'id': 1
+                    },
+                    'geometry': {
+                        'type': 'Point',
+                        'coordinates': [4.9508, 52.3571]
+                    }
+                },
+                {
+                    'type': 'Feature',
+                    'properties': {
+                        'description': '<strong>Equinix AM3 - Amsterdam, Science Park</strong><p>Equinix, Inc.</p><p></p>',
+                        'url': 'img2.png',
+                        'id': 2
+                    },
+                    'geometry': {
+                        'type': 'Point',
+                        'coordinates': [4.9614, 52.3546]
+                    }
+                }
+            ]
+        }
     }
-} satisfies Actions
+
+    return datacentersGeoJson;
+}

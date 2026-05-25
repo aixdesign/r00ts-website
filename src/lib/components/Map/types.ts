@@ -10,6 +10,7 @@ export interface DatacenterInfo {
     properties: {
         description: string;
         url: string;
+        id: number;
     };
     geometry: {
         type: string;

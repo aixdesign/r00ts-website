@@ -3,7 +3,7 @@ import path from 'path';
 import Database from 'better-sqlite3';
 import { migrate } from '@blackglory/better-sqlite3-migrations';
 
-import type { Article, Datacenter, Network } from '$lib/types';
+import { type Note, type Datacenter, type Network, NoteType } from '$lib/types';
 
 import { NETWORKSDB_API } from '$env/static/private';
 import { CONTINENT_COUNTRY_LIST, COUNTRY_CODE_TO_NAME } from './countries';
@@ -23,29 +23,65 @@ import { intToIP, IPtoInt } from './ip_utils';
 
 const filenames = await findMigrationFilenames(path.join(process.cwd(), 'src/lib/server/migrations'));
 const migrations = await Promise.all(filenames.map(readMigrationFile));
-// console.log(migrations);
 
 migrate(db, migrations);
 
 // Convenience methods to interact with the database
-export function getArticles() {
-    const articles = db.prepare("SELECT * FROM Articles").all() as Article[];
-    return { articles };
+export function getAllNotes() {
+    const notes = db.prepare("SELECT * FROM Notes").all() as Note[];
+    return { notes };
 }
 
-export function addArticle(title: string, url: string, description: string) {
-    const date = Math.floor(Date.now() / 1000);
+export function getNotes(id?: number, datacenter_id?: number | null) {
+    let statement;
+    let args: number[] = [];
+    if (id != undefined) {
+        statement = db.prepare('SELECT * FROM Notes WHERE id = ?');
+        args = [id];
+    } else if (datacenter_id != undefined) {
+        statement = db.prepare('SELECT * FROM Notes WHERE datacenter_id = ?');
+        args = [datacenter_id];
+    } else {
+        return getAllNotes();
+    }
+
+    const notes = statement.all(args);
+    return { notes };
+}
+
+export function addNote(type: NoteType, title?: string, url?: string, body?: string, datacenter_id?: number | null) {
+    console.log("addNote:", title, url, body, type, datacenter_id);
+
+    if (type == NoteType.Article) {
+        if (title == undefined || url == undefined)
+            return { success: false, code: 400, reason: 'title and url must be provided' };
+    } else if (type == NoteType.Image) {
+        if (url == undefined)
+            return { success: false, code: 400, reason: 'url must be provided' };
+
+        const image_extensions = ['.jpg', '.jpeg', '.png', '.tiff', '.webp'];
+        if (!image_extensions.some((val) => url.endsWith(val)))
+            return { success: false, code: 400, reason: 'url not accepted image type' };
+    } else if (type == NoteType.Comment) {
+        if (!url || !datacenter_id)
+            return { success: false, code: 400, reason: 'body and datacenter_id must be provided' };
+    } else {
+        return { success: false, code: 400, reason: 'note type not valid' };
+    }
+
+    const timestamp = Math.floor(Date.now() / 1000);
 
     try {
-        const statement = db.prepare('INSERT INTO Articles(title, url, description, date) VALUES (?, ?, ?, ?)');
-        const result = statement.run(title, url, description, date);
+        const statement = db.prepare('INSERT INTO Notes(type, title, url, body, datacenter_id, timestamp) VALUES (?, ?, ?, ?, ?, ?)');
+        const result = statement.run(type, title, url, body, datacenter_id, timestamp);
 
         console.log(result);
     } catch (error) {
-        return { success: false }
+        console.error(error);
+        return { success: false, code: 500, reason: 'Error adding note to database' };
     }
 
-    return { success: true };
+    return { success: true, code: 201 };
 }
 
 export async function getNetwork(ip: number | string) {
@@ -124,9 +160,6 @@ export async function getNetwork(ip: number | string) {
 }
 
 async function findDatacenters(net_id: number, country_code: string | null, level: number = 1) {
-    // console.log("findDatacenters");
-    // console.log(`${net_id} ${country_code} ${level}`);
-
     const fac_url_base = "https://peeringdb.com/api/netfac";
     const searchParams = new URLSearchParams({ net_id: net_id.toString() });
 
@@ -147,7 +180,6 @@ async function findDatacenters(net_id: number, country_code: string | null, leve
     }
 
     let fac_url = `${fac_url_base}?${searchParams.toString()}`;
-    // console.log(fac_url);
 
     let fac_info = await fetch(fac_url).then(r => r.json()).catch(err => {
         console.error("Error fetching from peeringdb");
@@ -157,10 +189,8 @@ async function findDatacenters(net_id: number, country_code: string | null, leve
 
     fac_info.data.forEach((val: any, index: number) => {
         val['country_name'] = COUNTRY_CODE_TO_NAME[val.country];
-        // console.log(`${val.country_name}`);
         fac_info.data[index] = val
     });
-    // console.log(fac_info);
 
     return fac_info;
 }

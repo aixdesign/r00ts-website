@@ -9,12 +9,12 @@
 </svelte:head>
 
 <nav>
-    <a href="/">Home</a>
-    <a href="/map">Map</a>
-    <a href="/about">About</a>
+    <h1>r00ts</h1>
 </nav>
 
-{@render children()}
+<div id="content">
+    {@render children()}
+</div>
 
 <footer>© 2026 AIxDESIGN</footer>
 
@@ -25,11 +25,15 @@
         font-family: Arial, Helvetica, sans-serif;
     }
 
+    h1 {
+        font-size: 42pt;
+        padding: 0em 1em;
+        margin: 0em;
+    }
+
     nav {
         position: fixed;
         z-index: 100;
-        padding: 0.5em;
-        background: white;
     }
 
     footer {

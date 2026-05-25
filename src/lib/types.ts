@@ -1,9 +1,17 @@
-export interface Article {
+export enum NoteType {
+    Article,
+    Image,
+    Comment
+};
+
+export interface Note {
     id: number,
-    title: string,
-    url: string,
-    description: string,
+    type: NoteType,
+    title?: string,
+    url?: string,
+    body?: string,
     date: number,
+    datacenter_id?: number | null
 };
 
 export interface Network {
