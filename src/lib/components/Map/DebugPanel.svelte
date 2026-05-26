@@ -3,7 +3,7 @@
     import { colourToString } from "./utils.ts";
     import { GLYPH_FUNCTIONS } from "./glyphRenderer.ts";
 
-    let { rasteriser } = $props();
+    let { rasteriser, mapBuildingsStyle, setBuildingStyle } = $props();
 
     let debugShow = $state(false);
 </script>
@@ -63,6 +63,32 @@
                         </td>
                     </tr>
                 {/each}
+                <tr>
+                    <td style="text-align: right;">buildings</td>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        <input
+                            type="color"
+                            value={mapBuildingsStyle["layers"][0]["paint"][
+                                "fill-color"
+                            ]}
+                            onchange={(ev) => {
+                                console.log(mapBuildingsStyle);
+
+                                const colour = ev.currentTarget.value;
+                                mapBuildingsStyle["layers"][0]["paint"][
+                                    "fill-color"
+                                ] = colour;
+                                mapBuildingsStyle["layers"][1]["paint"][
+                                    "fill-color"
+                                ] = colour;
+                                setBuildingStyle(mapBuildingsStyle);
+                            }}
+                        />
+                    </td>
+                    <td></td>
+                </tr>
             </tbody>
         </table>
     </div>

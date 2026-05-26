@@ -280,6 +280,7 @@ export class MapRaseriser {
     }
 
     resize(width?: number, height?: number) {
+        // TODO: keep canvas size same but change glyphOverlayCtx.scale to dpr?
         const dpr = window.devicePixelRatio || 1;
         if (width != undefined)
             this.glyphOverlayCanvas.width = width / dpr;

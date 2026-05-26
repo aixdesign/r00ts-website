@@ -6,7 +6,7 @@
 
     import { syncMaps } from "./utils.ts";
 
-    import mapBuildings from "./osm_buildings.json";
+    import mapBuildingsStyle from "./osm_buildings.json";
     import mapStyle from "./osm_surface.json";
 
     import { MapRaseriser } from "./glyphRenderer.ts";
@@ -17,6 +17,7 @@
     let mapContainer: HTMLDivElement;
     let mapBuildingsContainer: HTMLDivElement;
     let map: maplibregl.Map;
+    let mapBuildingsLayer: maplibregl.Map;
 
     let mapCanvas: HTMLCanvasElement;
     let glyphOverlayCanvas: HTMLCanvasElement;
@@ -39,10 +40,14 @@
 
     let rasteriser = $state<MapRaseriser | null>(null);
 
+    function setBuildingStyle(style: maplibregl.StyleSpecification | string) {
+        mapBuildingsLayer.setStyle(style, { diff: true });
+    }
+
     onMount(() => {
-        const mapBuildingsLayer: maplibregl.Map = new maplibregl.Map({
+        mapBuildingsLayer = new maplibregl.Map({
             container: mapBuildingsContainer,
-            style: mapBuildings as maplibregl.StyleSpecification,
+            style: mapBuildingsStyle as maplibregl.StyleSpecification,
         });
 
         map = new maplibregl.Map({
@@ -124,7 +129,7 @@
 <canvas bind:this={glyphOverlayCanvas} class="map-overlay" id="glyph-render">
 </canvas>
 
-<DebugPanel {rasteriser} />
+<DebugPanel {rasteriser} {mapBuildingsStyle} {setBuildingStyle} />
 
 <style>
     .map-container {
