@@ -1,5 +1,7 @@
 import type { GlyphParams } from './types.ts';
 
+export const glyphSize = $state({ value: 10 });
+
 export const glyphState: GlyphParams[] = $state.raw([
     {
         glyphName: "circle_small",

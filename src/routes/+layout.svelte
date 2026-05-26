@@ -12,9 +12,7 @@
     <h1>r00ts</h1>
 </nav>
 
-<div id="content">
-    {@render children()}
-</div>
+{@render children()}
 
 <footer>© 2026 AIxDESIGN</footer>
 
