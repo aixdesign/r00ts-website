@@ -56,7 +56,7 @@
         aria-label="Datacenter"
         onkeydown={(e) => e.key === "Enter" && onclick?.()}
     >
-        <div class="aerial" style="background-image: url({url})"></div>
+        <img class="aerial" src={url} alt="Aerial view" />
     </div>
 </div>
 
@@ -66,7 +66,6 @@
         width: 200px;
         transition-property: width, height !important;
         transition-duration: 1s !important;
-        padding: 0.8em;
         position: relative;
         cursor: pointer;
         z-index: 2;
@@ -79,6 +78,7 @@
     .aerial {
         background-size: cover;
         height: 100%;
+        border: 0.8em solid white;
     }
 
     .marker-small {
@@ -90,7 +90,6 @@
         position: absolute;
         background: white;
         padding: 6px 10px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         display: flex;
         flex-direction: column;
         align-items: center;

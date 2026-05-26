@@ -124,29 +124,45 @@
     });
 </script>
 
-<div bind:this={mapBuildingsContainer} class="base-map map-overlay"></div>
-<div bind:this={mapContainer} class="map-container"></div>
-<canvas bind:this={glyphOverlayCanvas} class="map-overlay" id="glyph-render">
-</canvas>
+<div class="map-container">
+    <div
+        id="buildings-map"
+        bind:this={mapBuildingsContainer}
+        class="base-map map-overlay"
+    ></div>
+
+    <div bind:this={mapContainer}></div>
+
+    <canvas
+        bind:this={glyphOverlayCanvas}
+        class="map-overlay"
+        id="glyph-render"
+    >
+    </canvas>
+</div>
 
 <DebugPanel {rasteriser} {mapBuildingsStyle} {setBuildingStyle} />
 
 <style>
     .map-container {
-        height: 100vh;
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+
+    .map-container * {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    #buildings-map {
+        z-index: 1;
     }
 
     .map-overlay {
-        position: absolute;
         pointer-events: none;
-        top: 0;
-    }
-
-    .base-map {
-        width: 100vw;
-        height: 100vh;
-        opacity: 1;
-        position: absolute;
-        z-index: 1;
     }
 </style>

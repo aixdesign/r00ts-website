@@ -8,14 +8,14 @@
     let debugShow = $state(false);
 </script>
 
-<div id="debug-view">
+<div
+    id="debug-view"
+    style="overflow: hidden; height: {debugShow ? null : '1em'};"
+>
     <button onclick={() => (debugShow = !debugShow)}>
         {debugShow ? "Hide" : "Show"}
     </button>
-    <div
-        class="horizontal"
-        style="overflow: hidden; height: {debugShow ? null : 0};"
-    >
+    <div class="horizontal">
         <table>
             <tbody>
                 {#each glyphState as gs}
@@ -74,8 +74,6 @@
                                 "fill-color"
                             ]}
                             onchange={(ev) => {
-                                console.log(mapBuildingsStyle);
-
                                 const colour = ev.currentTarget.value;
                                 mapBuildingsStyle["layers"][0]["paint"][
                                     "fill-color"
@@ -111,7 +109,7 @@
 <style>
     #debug-view {
         position: fixed;
-        bottom: 0;
+        bottom: 1.6em;
         padding: 1em;
         border: 1px red solid;
         z-index: 1000;
