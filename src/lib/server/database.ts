@@ -3,7 +3,7 @@ import path from 'path';
 import Database from 'better-sqlite3';
 import { migrate } from '@blackglory/better-sqlite3-migrations';
 
-import { type Note, type Datacenter, type Network, NoteType } from '$lib/types';
+import { type Note, type Datacenter, type Network, NoteType, type PostResult } from '$lib/types';
 
 import { NETWORKSDB_API } from '$env/static/private';
 import { CONTINENT_COUNTRY_LIST, COUNTRY_CODE_TO_NAME } from './countries';
@@ -49,21 +49,21 @@ export function getNotes(id?: number, datacenter_id?: number | null) {
     return { notes };
 }
 
-export function addNote(type: NoteType, title?: string, url?: string, body?: string, datacenter_id?: number | null) {
+export function addNote(type: NoteType, title?: string, url?: string, body?: string, datacenter_id?: number | null): PostResult {
     console.log("addNote:", title, url, body, type, datacenter_id);
 
     if (type == NoteType.Article) {
-        if (title == undefined || url == undefined)
+        if (!title || !url)
             return { success: false, code: 400, reason: 'title and url must be provided' };
     } else if (type == NoteType.Image) {
-        if (url == undefined)
+        if (!url)
             return { success: false, code: 400, reason: 'url must be provided' };
 
         const image_extensions = ['.jpg', '.jpeg', '.png', '.tiff', '.webp'];
         if (!image_extensions.some((val) => url.endsWith(val)))
             return { success: false, code: 400, reason: 'url not accepted image type' };
     } else if (type == NoteType.Comment) {
-        if (!url || !datacenter_id)
+        if (!body || !datacenter_id)
             return { success: false, code: 400, reason: 'body and datacenter_id must be provided' };
     } else {
         return { success: false, code: 400, reason: 'note type not valid' };

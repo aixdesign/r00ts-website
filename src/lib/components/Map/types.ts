@@ -3,6 +3,7 @@ export interface Props {
     center?: [number, number];
     geoJSON?: any;
     glyphSize?: number;
+    children?: any
 }
 
 export interface DatacenterInfo {

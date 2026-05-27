@@ -11,7 +11,7 @@
 
     import { MapRaseriser } from "./glyphRenderer.ts";
     import type { DatacenterInfo, Props } from "./types.ts";
-    import { addMarker, clearActiveMarker } from "./marker.svelte.ts";
+    import { addMarker, markerState } from "./marker.svelte.ts";
     import DebugPanel from "./DebugPanel.svelte";
 
     let mapContainer: HTMLDivElement;
@@ -30,6 +30,7 @@
         center = [0, 0],
         geoJSON,
         glyphSize = 10,
+        children,
     }: Props = $props();
 
     let datacenterMarkers: {
@@ -44,10 +45,26 @@
         mapBuildingsLayer.setStyle(style, { diff: true });
     }
 
+    $effect(() => {
+        if (markerState.activeId == null) {
+            map?.easeTo({ padding: { right: 0 }, duration: 1000 });
+        } else {
+            map?.flyTo({
+                zoom: 15,
+                center: [markerState.lng, markerState.lat],
+                padding: { right: 350 },
+                duration: 1000,
+            });
+        }
+    });
+
     onMount(() => {
         mapBuildingsLayer = new maplibregl.Map({
             container: mapBuildingsContainer,
             style: mapBuildingsStyle as maplibregl.StyleSpecification,
+            center,
+            zoom,
+            interactive: false,
         });
 
         map = new maplibregl.Map({
@@ -58,6 +75,18 @@
         });
 
         syncMaps(map, mapBuildingsLayer);
+
+        if (geoJSON) {
+            const coordinates = geoJSON.data.features.map((f: any) => {
+                return f.geometry.coordinates;
+            });
+
+            map.fitBounds(coordinates, {
+                maxZoom: 14,
+                padding: 30,
+                animate: false,
+            });
+        }
 
         mapCanvas = map.getCanvas();
         mapCanvas.style.opacity = "0";
@@ -111,8 +140,10 @@
         });
 
         map.on("click", () => {
-            clearActiveMarker();
+            markerState.activeId = null;
         });
+
+        rasteriser?.resize(mapCanvas.width, mapCanvas.height);
     });
 
     onDestroy(() => {
@@ -121,6 +152,7 @@
             unmount(component);
         }
         map?.remove();
+        mapBuildingsContainer?.remove();
     });
 </script>
 
@@ -128,20 +160,20 @@
     <div
         id="buildings-map"
         bind:this={mapBuildingsContainer}
-        class="base-map map-overlay"
+        class="base-map map-overlay fill"
     ></div>
 
-    <div bind:this={mapContainer}></div>
+    <div bind:this={mapContainer} class="fill"></div>
 
     <canvas
         bind:this={glyphOverlayCanvas}
-        class="map-overlay"
+        class="map-overlay fill"
         id="glyph-render"
     >
     </canvas>
+    <DebugPanel {rasteriser} {mapBuildingsStyle} {setBuildingStyle} />
+    {@render children?.()}
 </div>
-
-<DebugPanel {rasteriser} {mapBuildingsStyle} {setBuildingStyle} />
 
 <style>
     .map-container {
@@ -150,7 +182,7 @@
         height: 100%;
     }
 
-    .map-container * {
+    .map-container .fill {
         position: absolute;
         top: 0;
         left: 0;

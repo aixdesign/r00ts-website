@@ -28,7 +28,6 @@
                         ></td>
                         <td>
                             <select
-                                bind:value={gs.glyphName}
                                 onchange={() => {
                                     rasteriser.refresh();
                                 }}
@@ -49,7 +48,6 @@
                                 onchange={() => {
                                     rasteriser.refresh();
                                 }}
-                                bind:value={gs.bg}
                             />
                         </td>
                         <td>
@@ -58,7 +56,6 @@
                                 onchange={() => {
                                     rasteriser.refresh();
                                 }}
-                                bind:value={gs.fg}
                             />
                         </td>
                     </tr>

@@ -14,6 +14,11 @@ export interface Note {
     datacenter_id?: number | null
 };
 
+export type NoteState = {
+    data: Note[] | null;
+    loading: boolean;
+};
+
 export interface Network {
     id: number,
     network_name: string,
@@ -39,4 +44,10 @@ export interface Datacenter {
     city: string,
     country_code: string,
     last_update: number,
+};
+
+export interface PostResult {
+    success: boolean,
+    code: number,
+    reason?: string
 };

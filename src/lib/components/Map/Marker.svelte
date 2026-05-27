@@ -1,55 +1,26 @@
 <script lang="ts">
-    import { NoteType, type Note } from "$lib/types";
-
     let {
         url = "",
         zoom = 13,
         open = false,
-        loading = false,
-        notes = [],
         onclick,
     }: {
+        id: number;
         url: string;
         zoom: number;
         open: boolean;
         loading: boolean;
-        notes: Note[] | null;
         onclick: (e?: MouseEvent) => void;
     } = $props();
 
     let zoomed = $derived(zoom < 13);
-    let noteEntries = $derived(notes != null ? notes : []);
-
-    function positionNote(index: number, total: number) {
-        const angle = (2 * Math.PI * index) / total - Math.PI / 2;
-        const radius = 90;
-        return {
-            x: Math.cos(angle) * radius,
-            y: Math.sin(angle) * radius,
-        };
-    }
 </script>
 
-<div class="marker-root">
-    {#if open}
-        {#if loading}
-            <span class="spinner"></span>
-        {/if}
-        {#each noteEntries as note, i}
-            {@const pos = positionNote(i, noteEntries.length)}
-            <div class="note" style="transform: translate({pos.x}, {pos.y})">
-                {#if note.type == NoteType.Article}
-                    <a href={note.url}>{note.title}</a>
-                {:else if note.type == NoteType.Image}
-                    <img class="image-note" src={note.url} alt={note.title} />
-                {:else if note.type == NoteType.Comment}
-                    <span>{note.body}</span>
-                {/if}
-            </div>
-        {/each}
-    {/if}
+<div class="marker-root" class:front={open}>
     <div
-        class="marker {zoomed ? 'marker-small' : ''}"
+        class="marker"
+        class:marker-open={open}
+        class:marker-small={zoomed}
         {onclick}
         role="button"
         tabindex="0"
@@ -61,6 +32,11 @@
 </div>
 
 <style>
+    .marker-root {
+        position: relative;
+        pointer-events: all;
+    }
+
     .marker {
         height: 200px;
         width: 200px;
@@ -71,6 +47,7 @@
         z-index: 2;
     }
 
+    .marker-open,
     .marker:hover {
         transform: scale(1.1);
     }
@@ -86,32 +63,12 @@
         height: 50px;
     }
 
-    .note {
-        position: absolute;
-        background: white;
-        padding: 6px 10px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 2px;
-        pointer-events: none;
-        white-space: nowrap;
-        z-index: 3;
+    :global(.datacenter-marker) {
+        z-index: 2;
+        pointer-events: all;
     }
 
-    .spinner {
-        display: block;
-        width: 16px;
-        height: 16px;
-        border: 2px solid #ddd;
-        border-top-color: #457b9d;
-        border-radius: 50%;
-        animation: spin 0.6s linear infinite;
-    }
-
-    @keyframes spin {
-        to {
-            transform: rotate(360deg);
-        }
+    :global(.datacenter-marker:has(.front)) {
+        z-index: 10;
     }
 </style>

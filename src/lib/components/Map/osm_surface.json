@@ -10,14 +10,6 @@
         "openmaptiles": {
             "type": "vector",
             "url": "https://tiles.openfreemap.org/planet"
-        },
-        "natural_earth_shaded_relief": {
-            "maxzoom": 6,
-            "tileSize": 256,
-            "tiles": [
-                "https://klokantech.github.io/naturalearthtiles/tiles/natural_earth_2_shaded_relief.raster/{z}/{x}/{y}.png"
-            ],
-            "type": "raster"
         }
     },
     "sprite": "https://maputnik.github.io/osm-liberty/sprites/osm-liberty",
@@ -31,30 +23,6 @@
             },
             "paint": {
                 "background-color": "rgba(0, 0, 255, 1)"
-            }
-        },
-        {
-            "id": "natural_earth",
-            "type": "raster",
-            "source": "natural_earth_shaded_relief",
-            "maxzoom": 20,
-            "layout": {
-                "visibility": "none"
-            },
-            "paint": {
-                "raster-opacity": {
-                    "base": 1.5,
-                    "stops": [
-                        [
-                            0,
-                            0.6
-                        ],
-                        [
-                            6,
-                            0.1
-                        ]
-                    ]
-                }
             }
         },
         {

@@ -26,6 +26,7 @@ export function syncMaps(...maps: Map[]) {
             const zoom = map.getZoom();
             const bearing = map.getBearing();
             const pitch = map.getPitch();
+            const padding = map.getPadding();
 
             const clones = maps.filter((_o, i) => i !== index);
             clones.forEach((clone) => {
@@ -34,6 +35,7 @@ export function syncMaps(...maps: Map[]) {
                     zoom: zoom,
                     bearing: bearing,
                     pitch: pitch,
+                    padding: padding
                 });
             });
 
