@@ -13,8 +13,7 @@ export const GLYPH_FUNCTIONS: { name: string, fn: GlyphDrawFn }[] = [
     {
         name: "line_h",
         fn: (ctx, s, fg) => {
-            if (typeof fg == "string") ctx.strokeStyle = fg;
-            else ctx.strokeStyle = colourToString(fg);
+            ctx.strokeStyle = colourToString(fg);
 
             ctx.beginPath();
             ctx.moveTo(0, s);
@@ -22,12 +21,22 @@ export const GLYPH_FUNCTIONS: { name: string, fn: GlyphDrawFn }[] = [
             ctx.stroke();
         }
     },
+    {
+        name: "line_v",
+        fn: (ctx, s, fg) => {
+            ctx.strokeStyle = colourToString(fg);
+
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(0, s);
+            ctx.stroke();
+        }
+    },
 
     {
         name: "circle_small",
         fn: (ctx, s, fg) => {
-            if (typeof fg == "string") ctx.fillStyle = fg;
-            else ctx.fillStyle = colourToString(fg);
+            ctx.fillStyle = colourToString(fg);
 
             ctx.beginPath();
             ctx.arc(s / 2, s / 2, s / 3, 0, Math.PI * 2);
@@ -38,8 +47,7 @@ export const GLYPH_FUNCTIONS: { name: string, fn: GlyphDrawFn }[] = [
     {
         name: "circle",
         fn: (ctx, s, fg) => {
-            if (typeof fg == "string") ctx.fillStyle = fg;
-            else ctx.fillStyle = colourToString(fg);
+            ctx.fillStyle = colourToString(fg);
 
             ctx.beginPath();
             ctx.arc(s / 2, s / 2, s / 2 - 1, 0, Math.PI * 2);
@@ -50,8 +58,7 @@ export const GLYPH_FUNCTIONS: { name: string, fn: GlyphDrawFn }[] = [
     {
         name: "wedge",
         fn: (ctx, s, fg) => {
-            if (typeof fg == "string") ctx.fillStyle = fg;
-            else ctx.fillStyle = colourToString(fg);
+            ctx.fillStyle = colourToString(fg);
 
             ctx.moveTo(0, 0);
             ctx.lineTo(s, 0);
@@ -64,8 +71,7 @@ export const GLYPH_FUNCTIONS: { name: string, fn: GlyphDrawFn }[] = [
     {
         name: "triangle",
         fn: (ctx, s, fg) => {
-            if (typeof fg == "string") ctx.fillStyle = fg;
-            else ctx.fillStyle = colourToString(fg);
+            ctx.fillStyle = colourToString(fg);
 
             ctx.moveTo(s / 2, 0);
             ctx.lineTo(s, s);
@@ -74,12 +80,23 @@ export const GLYPH_FUNCTIONS: { name: string, fn: GlyphDrawFn }[] = [
             ctx.fill();
         }
     },
+    {
+        name: "triangle_d",
+        fn: (ctx, s, fg) => {
+            ctx.fillStyle = colourToString(fg);
+
+            ctx.moveTo(s / 2, s);
+            ctx.lineTo(s, 0);
+            ctx.lineTo(0, 0);
+            ctx.closePath();
+            ctx.fill();
+        }
+    },
 
     {
         name: "cross",
         fn: (ctx, s, fg) => {
-            if (typeof fg == "string") ctx.strokeStyle = fg;
-            else ctx.strokeStyle = colourToString(fg);
+            ctx.strokeStyle = colourToString(fg);
 
             const o = s * 0.1;
             ctx.lineWidth = 2;
@@ -95,8 +112,7 @@ export const GLYPH_FUNCTIONS: { name: string, fn: GlyphDrawFn }[] = [
     {
         name: "slash",
         fn: (ctx, s, fg) => {
-            if (typeof fg == "string") ctx.strokeStyle = fg;
-            else ctx.strokeStyle = colourToString(fg);
+            ctx.strokeStyle = colourToString(fg);
 
             const o = s * 0.1;
             ctx.lineWidth = 2;
