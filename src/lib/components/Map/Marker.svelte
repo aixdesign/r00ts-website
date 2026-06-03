@@ -2,16 +2,20 @@
     import type { Weather } from "$lib/types";
 
     let {
-        url = "",
+        url,
+        name,
         zoom = 13,
         open = false,
         weather = undefined,
+        loading = true,
         onclick,
     }: {
         id: number;
-        url: string;
+        url?: string;
+        name: string;
         zoom: number;
         open: boolean;
+        loading: boolean;
         weather?: Weather;
         onclick: (e?: MouseEvent) => void;
     } = $props();
@@ -30,7 +34,11 @@
         aria-label="Datacenter"
         onkeydown={(e) => e.key === "Enter" && onclick?.()}
     >
-        <img class="aerial" src={url} alt="Aerial view" />
+        <img
+            class="aerial"
+            src={url ? url : "img1.png"}
+            alt="Aerial view of {name}"
+        />
         {#if weather && open}
             <div class="weather">
                 {weather.temp}°C

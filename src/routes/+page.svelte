@@ -2,11 +2,12 @@
     import DataPanel from "$lib/components/InfoPanels/DataPanel.svelte";
     import Map from "$lib/components/Map/Map.svelte";
 
-    let { data } = $props();
+    const { data } = $props();
+    let { datacenters, datacentersGeoJson } = data;
 </script>
 
 <div class="contents">
-    <Map geoJSON={data}>
+    <Map {datacenters} geoJSON={datacentersGeoJson}>
         <DataPanel />
     </Map>
 </div>

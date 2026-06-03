@@ -1,9 +1,10 @@
-import type { Weather } from "$lib/types";
+import type { Datacenter, Weather } from "$lib/types";
 
 export interface Props {
     zoom?: number;
     center?: [number, number];
     geoJSON?: any;
+    datacenters?: Datacenter[];
     glyphSize?: number;
     children?: any
 }

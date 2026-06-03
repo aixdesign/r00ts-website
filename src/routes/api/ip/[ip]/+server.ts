@@ -9,6 +9,8 @@ export async function GET({ params, url, getClientAddress }) {
     const { ip } = params;
     let country_code = url.searchParams.get('country_code');
 
+    console.log(`[GET] /api/ip/${ip} country_code: ${country_code}`);
+
     if (!country_code) {
         const userIP = getClientAddress();
         const data = await fetch(`http://ip-api.com/json/${userIP}`).then(res => res.json()).catch(err => console.log(err));
@@ -17,7 +19,7 @@ export async function GET({ params, url, getClientAddress }) {
             console.log("WARNING: setting default country_code to 'nl'");
             country_code = 'nl';
         } else
-            country_code = data.countryCode;
+            country_code = data.countryCode as string;
     }
 
     if (!ip)
@@ -33,15 +35,14 @@ export async function GET({ params, url, getClientAddress }) {
     if (isIpReserved(ip_int))
         return json({ reserved: true });
 
-    const network = await getNetwork(ip_int);
-    if (!network.success)
-        error(500, network.reason);
+    const networkRequest = await getNetwork(ip_int);
+    if (!networkRequest.success)
+        error(500, networkRequest.reason);
 
-    if (!network.result?.asn)
+    if (!networkRequest.network?.asn)
         error(500, 'ASN not found for network');
 
-    const level = 1;
-    const facilitiesRequest = await getDatacenters(network.result.asn, country_code, level);
+    const facilitiesRequest = await getDatacenters(networkRequest.network.asn, country_code);
 
     if (!facilitiesRequest.success)
         error(500, facilitiesRequest.reason);

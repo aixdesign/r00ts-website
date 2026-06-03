@@ -13,6 +13,7 @@
     import type { DatacenterInfo, Props } from "./types.ts";
     import { addMarker, markerState } from "./marker.svelte.ts";
     import DebugPanel from "./DebugPanel.svelte";
+    import Marker from "./Marker.svelte";
 
     let mapContainer: HTMLDivElement;
     let mapBuildingsContainer: HTMLDivElement;
@@ -29,6 +30,7 @@
         zoom = 2,
         center = [0, 0],
         geoJSON,
+        datacenters,
         glyphSize = 10,
         children,
     }: Props = $props();
@@ -76,17 +78,24 @@
 
         syncMaps(map, mapBuildingsLayer);
 
-        if (geoJSON) {
-            const coordinates = geoJSON.data.features.map((f: any) => {
-                return f.geometry.coordinates;
-            });
+        if (datacenters?.length) {
+            const bounds = datacenters.reduce((bounds, dc) => {
+                return bounds.extend([dc.lon, dc.lat]);
+            }, new maplibregl.LngLatBounds());
 
-            map.fitBounds(coordinates, {
+            map.fitBounds(bounds, {
                 maxZoom: 14,
                 padding: 30,
                 animate: false,
             });
         }
+        // if (geoJSON) {
+        //     const coordinates = geoJSON.data.features.map((f: any) => {
+        //         return f.geometry.coordinates;
+        //     });
+        //
+        // });
+        // }
 
         mapCanvas = map.getCanvas();
         mapCanvas.style.opacity = "0";
@@ -129,25 +138,39 @@
 
         rasteriser?.resize(mapCanvas.width, mapCanvas.height);
 
-        if (geoJSON) {
-            console.log(geoJSON);
-            geoJSON.data.features.forEach((ds: DatacenterInfo) => {
-                const { url, id, weather, name, links } = ds.properties;
-                const { coordinates } = ds.geometry;
-
+        if (datacenters?.length) {
+            datacenters.forEach((dc) => {
+                const { id, name, lat, lon, precise } = dc;
                 datacenterMarkers.push(
                     addMarker(map, {
-                        lat: coordinates[1],
-                        lng: coordinates[0],
-                        url,
+                        lat,
+                        lng: lon,
                         id,
                         name,
-                        links,
-                        weather,
                     }),
                 );
             });
         }
+
+        // if (geoJSON) {
+        //     console.log(geoJSON);
+        //     geoJSON.data.features.forEach((ds: DatacenterInfo) => {
+        //         const { url, id, weather, name, links } = ds.properties;
+        //         const { coordinates } = ds.geometry;
+        //
+        //         datacenterMarkers.push(
+        //             addMarker(map, {
+        //                 lat: coordinates[1],
+        //                 lng: coordinates[0],
+        //                 url,
+        //                 id,
+        //                 name,
+        //                 links,
+        //                 weather,
+        //             }),
+        //         );
+        //     });
+        // }
     });
 
     onDestroy(() => {

@@ -12,13 +12,25 @@ With support from [Stimulerings Fonds](https://www.stimuleringsfonds.nl/).
 
 [![MapLibre](https://img.shields.io/badge/MapLibre-396CB2?logo=MapLibre)](https://maplibre.org/)
 
-[![SvelteKit](https://img.shields.io/badge/SvelteKit-%23f1413d.svg?logo=svelte&logoColor=white)](#)
-[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=fff)](#)
+[![SvelteKit](https://img.shields.io/badge/SvelteKit-%23f1413d.svg?logo=svelte&logoColor=white)](https://svelte.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=fff)](https://www.typescriptlang.org/)
 
 ## Developing
 
 Once you've installed dependencies with `npm install` (or `pnpm install` or
-`yarn`), start a development server:
+`yarn`), install a local copy of `PeeringDB` (with a python environment):
+
+```sh
+pip install peeringdb
+
+# in the wizard, set the database file to be created in r00ts-website/
+peeringdb config set
+
+# sync the database (~15mins first time)
+peeringdb sync
+```
+
+Start a development server:
 
 ```sh
 npm run dev

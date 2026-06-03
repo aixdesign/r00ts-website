@@ -10,11 +10,6 @@ export function IPtoInt(ip: string) {
     }
 
     const [octet1, octet2, octet3, octet4] = ip.split('.');
-    // console.log(`${octet1} ${octet2} ${octet3} ${octet4}`)
-    // console.log((octet1 << 24) >>> 0);
-    // console.log(octet2 << 16)
-    // console.log(octet3 << 8)
-    // console.log(octet4)
     return (((parseInt(octet1) << 24) >>> 0) | (parseInt(octet2) << 16) | (parseInt(octet3) << 8) | parseInt(octet4)) >>> 0;
 }
 

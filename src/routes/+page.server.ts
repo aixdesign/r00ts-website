@@ -1,8 +1,18 @@
-import type { Weather } from "$lib/types";
+import { getDatacentersFromIds } from "$lib/server/database.js";
+import type { Datacenter, Weather } from "$lib/types";
 
 const weatherCache: { [key: number]: Weather } = {};
 
-export async function load() {
+export async function load({ url }) {
+    const ids = url.searchParams.get('ids');
+
+    let datacenters: Datacenter[] = [];
+    if (ids) {
+        const ids_obj = JSON.parse(ids);
+        if (Array.isArray(ids_obj))
+            datacenters = getDatacentersFromIds(ids_obj);
+    }
+
     // TODO: load from database!
     const datacentersGeoJson = {
         'type': 'geojson',
@@ -43,45 +53,45 @@ export async function load() {
     }
 
     // Get weather info
-    const now = Date.now() / 1000;
-    for (const { properties, geometry } of datacentersGeoJson.data.features) {
-        const { id } = properties;
-        if (!weatherCache[id] || weatherCache[id].timestamp > now + 60 * 60) {
+    // const now = Date.now() / 1000;
+    // for (const { properties, geometry } of datacentersGeoJson.data.features) {
+    //     const { id } = properties;
+    //     if (!weatherCache[id] || weatherCache[id].timestamp > now + 60 * 60) {
+    //
+    //         const [lng, lat] = geometry.coordinates;
+    //
+    //         const params = new URLSearchParams({
+    //             latitude: String(lat),
+    //             longitude: String(lng),
+    //             current: 'weather_code,temperature_2m',
+    //             forcast_days: '1'
+    //         });
+    //
+    //         const url = `https://api.open-meteo.com/v1/forecast?${params}`;
+    //         console.log(url);
+    //
+    //         try {
+    //             const res = await fetch(url);
+    //             const data = await res.json();
+    //             const weather: Weather = {
+    //                 timestamp: now,
+    //                 temp: data.current.temperature_2m,
+    //                 weatherCode: data.current.weather_code
+    //             }
+    //
+    //             weatherCache[id] = weather;
+    //             properties.weather = weather;
+    //         } catch (err) {
+    //             console.error(err)
+    //             continue;
+    //         }
+    //
+    //
+    //
+    //     } else {
+    //         properties.weather = weatherCache[id];
+    //     }
+    // }
 
-            const [lng, lat] = geometry.coordinates;
-
-            const params = new URLSearchParams({
-                latitude: String(lat),
-                longitude: String(lng),
-                current: 'weather_code,temperature_2m',
-                forcast_days: '1'
-            });
-
-            const url = `https://api.open-meteo.com/v1/forecast?${params}`;
-            console.log(url);
-
-            try {
-                const res = await fetch(url);
-                const data = await res.json();
-                const weather: Weather = {
-                    timestamp: now,
-                    temp: data.current.temperature_2m,
-                    weatherCode: data.current.weather_code
-                }
-
-                weatherCache[id] = weather;
-                properties.weather = weather;
-            } catch (err) {
-                console.error(err)
-                continue;
-            }
-
-
-
-        } else {
-            properties.weather = weatherCache[id];
-        }
-    }
-
-    return datacentersGeoJson;
+    return { datacentersGeoJson, datacenters };
 }

@@ -3,10 +3,10 @@ import path from 'path';
 import Database from 'better-sqlite3';
 import { migrate } from '@blackglory/better-sqlite3-migrations';
 
-import { type Note, type Datacenter, type Network, NoteType, type PostResult } from '$lib/types';
+import { type Note, type Datacenter, type Network, NoteType, type PostResult, type IpBlock, type Facility, type City } from '$lib/types';
 
 import { NETWORKSDB_API } from '$env/static/private';
-import { CONTINENT_COUNTRY_LIST, COUNTRY_CODE_TO_NAME } from './countries';
+import { CONTINENT_COUNTRY_LIST } from './countries';
 
 if (!NETWORKSDB_API)
     console.warn("NETWORKSDB_API not set! Cannot fetch new ip block info.");
@@ -20,6 +20,7 @@ db.pragma('journal_mode = WAL');
 
 import { findMigrationFilenames, readMigrationFile } from 'migration-files'
 import { intToIP, IPtoInt } from './ip_utils';
+import { getFacilitiesFromASN, getPeeringDBNetwork } from './peeringdb';
 
 const filenames = await findMigrationFilenames(path.join(process.cwd(), 'src/lib/server/migrations'));
 const migrations = await Promise.all(filenames.map(readMigrationFile));
@@ -27,6 +28,15 @@ const migrations = await Promise.all(filenames.map(readMigrationFile));
 migrate(db, migrations);
 
 // Convenience methods to interact with the database
+function tableInsert(table: string, parameters: any, on_conflict?: string) {
+    const keys = Object.keys(parameters);
+    const values = Object.values(parameters);
+    const placeholder = keys.map(_ => "?").join(',');
+    const conflict_clause = on_conflict ? `ON CONFLICT ${on_conflict}` : '';
+    const statement = `INSERT INTO ${table}(${keys.join(',')}) VALUES(${placeholder}) ${conflict_clause}`;
+    return db.prepare(statement).run(values);
+}
+
 export function getAllNotes() {
     const notes = db.prepare("SELECT * FROM Notes").all() as Note[];
     return { notes };
@@ -84,7 +94,8 @@ export function addNote(type: NoteType, title?: string, url?: string, body?: str
     return { success: true, code: 201 };
 }
 
-export async function getNetwork(ip: number | string) {
+export async function getNetwork(ip: number | string)
+    : Promise<{ success: boolean, reason?: string, network?: Network }> {
     let ip_int: number;
     let ip_str: string;
 
@@ -100,104 +111,124 @@ export async function getNetwork(ip: number | string) {
     if (ip_int == -1)
         return { success: false, reason: 'Invalid IP address' };
 
-    let net: Network = db.prepare('SELECT * FROM Networks WHERE ? BETWEEN start_int AND end_int').get(ip_int) as Network;
+    let ipBlock: IpBlock = db.prepare(
+        'SELECT * FROM IpBlocks WHERE ? BETWEEN start_int AND end_int'
+    ).get([ip_int]) as IpBlock;
 
-    if (!net) {
-        // Not in local database, fetch from NetworksDB
-        if (!NETWORKSDB_API) {
-            console.warn("NETWORKSDB_API not set, cannot complete request");
-            return { success: false, reason: 'No access token for NetworksDB' };
-        }
-
-        const params = new URLSearchParams({ ip: ip_str });
-        const result = await fetch(`https://networksdb.io/api/ip-info?${params}`, {
-            method: 'GET',
-            headers: {
-                'X-Api-Key': NETWORKSDB_API
-            }
-        });
-
-        const data = await result.json();
-
-        const { organisation, network, asn } = data;
-        const organisation_name = organisation.name;
-        const { netname: network_name, description, first_ip: ip_start, last_ip: ip_end, cidr } = network;
-        let as_number = null;
-        if (asn && asn.asn)
-            as_number = asn.asn;
-
-        const start_int = IPtoInt(ip_start);
-        const end_int = IPtoInt(ip_end);
-
-        let id;
-
+    if (ipBlock) {
         try {
-            const stmt = db.prepare("INSERT INTO Networks(organisation_name, network_name, description, ip_start, ip_end, start_int, end_int, ip_cidr, asn) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            const result = stmt.run([organisation_name, network_name, description, ip_start, ip_end, start_int, end_int, cidr, as_number]);
-            id = result.lastInsertRowid;
-        } catch (error) {
-            console.error("Error inserting into Networks:");
-            console.error(error);
-            return { success: false, reason: 'Error inserting into Networks' };
-        }
-
-        net = {
-            id: id as number,
-            organisation_name,
-            network_name,
-            description,
-            ip_start,
-            ip_end,
-            start_int,
-            end_int,
-            ip_cidr: cidr,
-            asn: as_number,
-            clues: []
+            let network = db.prepare('SELECT * FROM Networks WHERE id = ?').get([ipBlock.network_id]) as Network;
+            return { success: true, network };
+        } catch (err) {
+            console.error(`Error getting Network with id ${ipBlock.network_id}`);
+            console.error(err);
+            return { success: false, reason: "Error getting network for ip block" };
         }
     }
 
-    return { success: true, result: net };
+    // Ip block not seen before, fetch from NetworksDB
+    if (!NETWORKSDB_API) {
+        console.warn("NETWORKSDB_API not set, cannot complete request");
+        return { success: false, reason: 'No access token for NetworksDB' };
+    }
+
+    const params = new URLSearchParams({ ip: ip_str });
+    const data = await fetch(`https://networksdb.io/api/ip-info?${params}`, {
+        method: 'GET',
+        headers: {
+            'X-Api-Key': NETWORKSDB_API
+        }
+    })
+        .then(res => res.json())
+        .catch(err => {
+            console.log('Error fetching from networksdb');
+            console.error(err)
+        })
+
+    if (!data) {
+        console.log('data is undefined');
+        return { success: false, reason: 'Failed to connect to networksdb' };
+    }
+
+    const { organisation, network, asn: as_number } = data;
+    const asn = as_number.asn;
+    const organisation_name = organisation.name;
+    let { netname: network_name, description, first_ip: ip_start, last_ip: ip_end, cidr } = network;
+
+    // in the case that the IP range does not conform to CIDR format (i.e. range not a power of 2)
+    if (cidr === 'N/A')
+        cidr = `${ip_start} to ${ip_end}`;
+
+    // Find if Network already exist in DB
+    let network_asn = db.prepare("SELECT * FROM Networks WHERE asn = ?").get([asn]) as Network;
+    let network_id;
+
+    if (network_asn) {
+        network_id = network_asn.id;
+    } else {
+
+        const peering_net = getPeeringDBNetwork(asn);
+        if (!peering_net)
+            return { success: false, reason: `Cannot find ${asn} in peeringdb` };
+
+        const network_params = {
+            net_id: peering_net.id,
+            network_name,
+            organisation_name,
+            description,
+            asn,
+            last_update: 0
+        };
+
+        const result = tableInsert('Networks', network_params);
+        network_id = result.lastInsertRowid as number;
+
+        network_asn = {
+            id: network_id,
+            ...network_params
+        };
+    }
+
+    // Create IpBlocks entry
+    const start_int = IPtoInt(ip_start);
+    const end_int = IPtoInt(ip_end);
+
+    const ip_params = {
+        ip_start,
+        ip_end,
+        start_int,
+        end_int,
+        network_id,
+        ip_cidr: cidr
+    };
+
+    try {
+        tableInsert('IpBlocks', ip_params);
+    } catch (err) {
+        console.log("Error adding ip block:");
+        console.log(ip_params);
+        console.log(err);
+        return { success: false, reason: 'Error adding ip block to database' };
+    }
+
+    return { success: true, network: network_asn };
 }
 
-async function findDatacenters(net_id: number, country_code: string | null, level: number = 1) {
-    const fac_url_base = "https://peeringdb.com/api/netfac";
-    const searchParams = new URLSearchParams({ net_id: net_id.toString() });
-
-    if (country_code && level != 3) {
-        if (level == 1) {
-            searchParams.append('country__in', country_code);
-        }
-        else if (level == 2) {
-            let neighbours = [country_code];
-            for (const continent of Object.keys(CONTINENT_COUNTRY_LIST)) {
-                if (CONTINENT_COUNTRY_LIST[continent].includes(country_code)) {
-                    neighbours = CONTINENT_COUNTRY_LIST[continent];
-                    break;
-                }
-            }
-            searchParams.append('country__in', neighbours.join(','));
+function getNeighbours(country_code: string) {
+    const cc = country_code.toUpperCase();
+    let neighbours = [cc];
+    for (const continent of Object.keys(CONTINENT_COUNTRY_LIST)) {
+        if (CONTINENT_COUNTRY_LIST[continent].includes(cc)) {
+            neighbours = CONTINENT_COUNTRY_LIST[continent];
+            break;
         }
     }
-
-    let fac_url = `${fac_url_base}?${searchParams.toString()}`;
-
-    let fac_info = await fetch(fac_url).then(r => r.json()).catch(err => {
-        console.error("Error fetching from peeringdb");
-        console.error(err);
-        return { data: [] };
-    });
-
-    fac_info.data.forEach((val: any, index: number) => {
-        val['country_name'] = COUNTRY_CODE_TO_NAME[val.country];
-        fac_info.data[index] = val
-    });
-
-    return fac_info;
+    return neighbours;
 }
 
 export async function getDatacenter(id: number) {
     if (id < 0)
-        return { success: false, reason: 'ID is out of range' };
+        return { success: false, reason: `id ${id} is out of range` };
 
     let datacenter = db.prepare('SELECT * FROM Datacenters WHERE id = ?').get([id]) as Datacenter;
 
@@ -207,7 +238,62 @@ export async function getDatacenter(id: number) {
     return { success: true, datacenter }
 }
 
-export async function getDatacenters(asn: number, country_code: string | null, level: number)
+function iterativeSearch(asn: number, country_code?: string): Datacenter[] {
+
+    const select_clause = `
+        SELECT d.id, d.fac_id, d.name, d.lat, d.lon, d.precise, d.city, d.country_code, d.links, d.last_update FROM Datacenters d
+        JOIN NetworksDatacenters ON d.id = NetworksDatacenters.datacenter_id
+        JOIN Networks ON Networks.id = NetworksDatacenters.network_id
+        WHERE Networks.asn = ?
+    `;
+    const country_clause = 'AND d.country_code LIKE ?';
+
+    let facility_query = [select_clause];
+    let facility_query_params: (string | number)[] = [asn];
+
+    if (country_code) {
+        facility_query.push(country_clause);
+        facility_query_params.push(country_code.toUpperCase());
+    }
+
+    console.log(" - 1 Initial search...");
+    // console.log(facility_query);
+    // console.log(facility_query_params);
+    let facilities = db.prepare(facility_query.join(' ')).all(facility_query_params) as Datacenter[];
+
+    if (facilities && facilities.length > 0)
+        return facilities;
+
+    if (!country_code) {
+        // First search was already entire world, return empty...
+        return [];
+    }
+
+    // If country code, broaden search to include continent...
+    const neighbours = getNeighbours(country_code);
+    const placeholders = neighbours.map(_ => "?").join(',');
+    const neighbour_clause = `AND d.country_code IN (${placeholders})`;
+    facility_query = [select_clause, neighbour_clause];
+    facility_query_params = [asn, ...neighbours];
+
+    console.log(" - 2 Attempting continent...");
+    // console.log(facility_query);
+    // console.log(facility_query_params);
+    facilities = db.prepare(facility_query.join(' ')).all(facility_query_params) as Datacenter[];
+
+    if (facilities && facilities.length > 0)
+        return facilities;
+
+    // Otherwise try worldwide...
+    console.log(" - 3 Attempting worldwide...");
+    // console.log(select_clause);
+    // console.log(asn);
+    facilities = db.prepare(select_clause).all(asn) as Datacenter[];
+
+    return facilities;
+}
+
+export async function getDatacenters(asn: number, country_code?: string)
     : Promise<{ success: boolean, reason?: string, facilities?: Datacenter[] }> {
 
     if (!asn)
@@ -218,87 +304,97 @@ export async function getDatacenters(asn: number, country_code: string | null, l
     if (!net)
         return { success: false, reason: `Network with ASN ${asn} not known to database` };
 
-    let facility_query_params: (string | number)[] = [asn];
-    let facility_query = `
-        SELECT d.id, d.fac_id, d.name, d.lat, d.lon, d.city, d.country_code, d.links, d.last_update FROM Datacenters d
-        JOIN NetworksDatacenters ON d.id = NetworksDatacenters.datacenter_id
-        JOIN Networks ON Networks.id = NetworksDatacenters.network_id
-        WHERE Networks.asn = ?
-    `;
+    let facilities: Datacenter[] = [];
 
-    if (country_code) {
-        facility_query += ' AND d.country_code LIKE ?';
-        facility_query_params.push(country_code);
-    }
+    // Only search if database is up to date
+    const now = Math.floor(Date.now() / 1000);
+    if (net.last_update >= now - (7 * 24 * 60 * 60)) {
+        facilities = iterativeSearch(asn, country_code);
+        console.log(`Found ${facilities.length} facilities`);
 
-    const facilities = db.prepare(facility_query).all(facility_query_params) as Datacenter[];
-    console.log('number of facilities in database:', facilities.length);
-
-    if (facilities && facilities.length > 0) {
-        return { success: true, facilities };
-    }
-
-    // Fetch facility info from PeeringsDB
-    console.log("Fetching facility info from PeeringsDB...");
-    const net_info = await fetch(`https://peeringdb.com/api/net?asn=${asn}`)
-        .then(r => r.json())
-        .catch(err => err);
-
-    let net_id;
-    try {
-        net_id = net_info['data'][0]['id'];
-    } catch (error) {
-        return { success: false, reason: `Error: ${error}` }
-    }
-
-    let fac_info = await findDatacenters(net_id, country_code, level);
-
-    if (country_code) {
-        while (level < 3 && (!fac_info || !fac_info.data || fac_info.data.length == 0)) {
-            level += 1;
-            console.log(`No Datacenters found, increasing level to ${level}`);
-            fac_info = await findDatacenters(net_id, country_code, level)
+        if (facilities && facilities.length > 0) {
+            return { success: true, facilities };
         }
     }
 
-    if (fac_info.length == 0)
-        return { success: false, reason: "No Datacenters found" };
+    // Fetch facility info from PeeringDB
+    console.log("Fetching facility info from PeeringsDB...");
 
-    console.log("Fetching location data of datacenters...");
-    const fac_ids = fac_info.data.map((el: any) => el.fac_id);
-    const fac_url_base = "https://peeringdb.com/api/fac";
-    const searchParams = new URLSearchParams();
-    searchParams.append('id__in', fac_ids.join(','));
+    // Fetch all facilities on network
+    const peeringdbFacilities = getFacilitiesFromASN(asn);
 
-    let fac_url = `${fac_url_base}?${searchParams.toString()}`;
+    const last_update = Math.floor(Date.now() / 1000);
 
-    const fac_info_details = await fetch(fac_url)
-        .then(res => res.json())
-        .catch(err => {
-            console.log(err);
-            return fac_info;
-        });
-
-    fac_info_details.data.forEach((val: any, index: number) => {
-        val['country_name'] = COUNTRY_CODE_TO_NAME[val.country];
-        fac_info_details.data[index] = val
-    });
-
-    // Add to database
-    const updated = Date.now();
-    const insert_clause = 'INSERT INTO Datacenters(fac_id, name, lat, lon, city, country_code, last_update) VALUES (?, ?, ?, ?, ?, ?, ?)';
-    const upsert_clause = 'ON CONFLICT DO UPDATE SET (fac_id, name, lat, lon, city, country_code, last_update) = (?, ?, ?, ?, ?, ?, ?)';
-    const insert = db.prepare(`${insert_clause} ${upsert_clause}`);
+    const insert_clause = 'INSERT INTO Datacenters(fac_id, name, lat, lon, precise, city, country_code, last_update) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+    const upsert_clause = 'ON CONFLICT DO UPDATE SET (last_update) = (?)';
+    const insert = db.prepare(`${insert_clause} ${upsert_clause} RETURNING id`);
     const xref_insert = db.prepare('INSERT INTO NetworksDatacenters(network_id, datacenter_id) VALUES (?, ?) ON CONFLICT DO NOTHING');
 
-    for (const detail of fac_info_details.data) {
-        const parameters = [detail.id, detail.name, detail.latitude, detail.longitude, detail.city, detail.country, updated];
-        const result = insert.run(parameters.concat(parameters));
-        console.log('lastInsertRowid: ', result.lastInsertRowid, 'network_id:', net.id);
-        if (result.lastInsertRowid > 0) {
-            xref_insert.run([net.id, result.lastInsertRowid]);
-        }
-    }
+    const doinsert = db.transaction((params: any[], last_update: number) => {
+        const row = insert.get([...params, last_update]) as Datacenter;
 
-    return { success: true, facilities: fac_info_details.data };
+        xref_insert.run(net.id, row.id);
+    });
+
+    peeringdbFacilities.forEach(async (fac: Facility) => {
+        let { latitude, longitude } = fac;
+        let precise = 1;
+
+        console.log(`lat/lon: ${latitude} ${longitude}`);
+
+        if (latitude === null || longitude === null) {
+            precise = 0;
+
+            const cityRow = db.prepare('SELECT * FROM Cities WHERE name LIKE ? AND country_code LIKE ?').get(fac.city, fac.country) as City;
+            if (!cityRow) {
+                const cityData = await fetch(
+                    `https://nominatim.openstreetmap.org/search?q=${fac.city}&countrycodes=${fac.country}&format=jsonv2&limit=1`,
+                    {
+                        headers: {
+                            'User-Agent': "DatacenterMap/1.0"
+                        }
+                    }
+
+                )
+                    .then(res => res.json())
+                    .catch(console.error);
+
+                if (!cityData) {
+                    console.error(`No city data found for ${fac.city} ${fac.country}`);
+                    return;
+                }
+
+                latitude = cityData[0].lat;
+                longitude = cityData[0].lon;
+
+                tableInsert(
+                    'Cities',
+                    { name: fac.city, country_code: fac.country, lat: latitude, lon: longitude },
+                    'DO NOTHING'
+                );
+            } else {
+                latitude = cityRow.lat;
+                longitude = cityRow.lon;
+            }
+        }
+
+        const parameters = [fac.id, fac.name, latitude, longitude, precise, fac.city, fac.country, last_update]
+        doinsert(parameters, last_update);
+    });
+
+    // Update network last_time
+    db.prepare('UPDATE Networks SET last_update = ? WHERE id = ?').run(last_update, net.id)
+
+    // Now perform iterativeSearch again...
+    facilities = iterativeSearch(asn, country_code);
+    console.log(`Found ${facilities.length} facilities`);
+
+    return { success: true, facilities };
+}
+
+export function getDatacentersFromIds(ids: number[]): Datacenter[] {
+    const placeholder = ids.map(_ => "?").join(',');
+    const datacenters = db.prepare(`SELECT * FROM Datacenters WHERE id IN (${placeholder})`).all(ids) as Datacenter[];
+
+    return datacenters;
 }

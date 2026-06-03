@@ -27,7 +27,7 @@ export function addMarker(
     }: {
         lng: number;
         lat: number;
-        url: string;
+        url?: string;
         id: number;
         name: string;
         links?: string[];
@@ -62,6 +62,7 @@ export function addMarker(
             },
             get loading() { return noteState.loading },
             url,
+            name,
             id,
             weather,
             onclick
