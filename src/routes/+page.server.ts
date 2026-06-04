@@ -5,6 +5,7 @@ const weatherCache: { [key: number]: Weather } = {};
 
 export async function load({ url }) {
     const ids = url.searchParams.get('ids');
+    const showDebug = url.searchParams.get('debug') ? true : false;
 
     let datacenters: Datacenter[] = [];
     if (ids) {
@@ -57,5 +58,5 @@ export async function load({ url }) {
     //     }
     // }
 
-    return { datacenters, weatherResults };
+    return { datacenters, weatherResults, showDebug };
 }

@@ -31,6 +31,7 @@
         datacenters,
         weatherData = {},
         glyphSize = 10,
+        showDebug = false,
         children,
     }: Props = $props();
 
@@ -170,7 +171,9 @@
         id="glyph-render"
     >
     </canvas>
-    <DebugPanel {rasteriser} {mapBuildingsStyle} {setBuildingStyle} />
+    {#if showDebug}
+        <DebugPanel {rasteriser} {mapBuildingsStyle} {setBuildingStyle} />
+    {/if}
     {@render children?.()}
 </div>
 

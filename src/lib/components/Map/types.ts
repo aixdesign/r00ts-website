@@ -7,6 +7,7 @@ export interface Props {
     datacenters?: Datacenter[];
     weatherData?: { [key: number]: Weather };
     glyphSize?: number;
+    showDebug?: boolean;
     children?: any
 }
 
