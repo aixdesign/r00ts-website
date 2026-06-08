@@ -99,6 +99,7 @@
             center,
             zoom,
             interactive: false,
+            attributionControl: false,
         });
 
         map = new maplibregl.Map({
@@ -106,6 +107,7 @@
             style: mapStyle as maplibregl.StyleSpecification,
             center,
             zoom,
+            attributionControl: false,
         });
 
         syncMaps(map, mapBuildingsLayer);
@@ -127,7 +129,7 @@
             glyphSize,
         );
 
-        map.addControl(new maplibregl.NavigationControl());
+        // map.addControl(new maplibregl.NavigationControl());
 
         map.on("render", () => {
             rasteriser?.renderGlyphs();
