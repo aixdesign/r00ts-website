@@ -32,7 +32,7 @@ export function addMarker(
         markerState.datacenter = datacenter;
 
         if (datacenterData.filename == null && datacenterData.precise) {
-            fetch(`/api/aerial/${datacenter.id}`)
+            fetch(`${import.meta.env.BASE_URL}/api/aerial/${datacenter.id}`)
                 .then(res => res.json())
                 .then(data => {
                     datacenterData.filename = data.filename;

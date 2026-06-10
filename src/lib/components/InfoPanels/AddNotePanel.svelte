@@ -42,7 +42,7 @@
                   : NoteType.Image;
 
         try {
-            const res = await fetch("/api/note", {
+            const res = await fetch(`${import.meta.env.BASE_URL}/api/note`, {
                 method: "POST",
                 body: JSON.stringify({
                     datacenter_id: id,

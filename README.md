@@ -18,9 +18,15 @@ With support from [Stimulerings Fonds](https://www.stimuleringsfonds.nl/).
 ## Developing
 
 Once you've installed dependencies with `npm install` (or `pnpm install` or
-`yarn`), install a local copy of `PeeringDB` (with a python environment):
+`yarn`), install a local copy of `PeeringDB` (~45Mb) in a local python
+environment:
 
 ```sh
+# (Optional) Create virtual environment:
+python3 -m venv venv
+source venv/bin/activate
+
+# install database
 pip install peeringdb
 
 # in the wizard, set the database file to be created in r00ts-website/

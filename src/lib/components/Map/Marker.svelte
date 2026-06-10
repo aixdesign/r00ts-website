@@ -48,7 +48,8 @@
         {#if datacenter.filename && datacenter.precise && !no_preview}
             <img
                 class="aerial"
-                src="/images/aerial/{datacenter.filename}"
+                src="{import.meta.env
+                    .BASE_URL}/images/aerial/{datacenter.filename}"
                 alt="Aerial view of {datacenter.name}"
             />
         {:else if open && !datacenter.precise && !zoomed && !no_preview}
