@@ -3,7 +3,7 @@ import { join } from 'path';
 
 import { MAPBOX_API } from '$env/static/private';
 
-const BASE_URL = "https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static";
+const MAPBOX_STATIC_URL = "https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static";
 const IMAGE_DIR = 'static/images/aerial';
 
 export async function fetchSatilliteView(
@@ -25,7 +25,7 @@ export async function fetchSatilliteView(
         'access_token': MAPBOX_API
     });
 
-    let url = `${BASE_URL}/${lng},${lat},${zoom},0/${width}x${height}?${queryParams.toString()}`;
+    let url = `${MAPBOX_STATIC_URL}/${lng},${lat},${zoom},0/${width}x${height}?${queryParams.toString()}`;
     console.log(url);
 
     await mkdir(IMAGE_DIR, { recursive: true });
