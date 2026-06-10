@@ -104,7 +104,7 @@
     });
 
     $effect(() => {
-        if (markerState.highlighted.length) {
+        if (markerState.highlighted?.length) {
             const bounds = new maplibregl.LngLatBounds();
             datacenterMarkers.map((dm) => {
                 if (markerState.highlighted.includes(dm.id))

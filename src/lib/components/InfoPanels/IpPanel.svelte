@@ -21,13 +21,10 @@
     }
 
     $effect(() => {
-        if (selectedNetId == null) {
+        if (selectedNetId == null || !networksDatacenters[selectedNetId]) {
             markerState.highlighted = [];
             return;
         }
-
-        $inspect(selectedNetId);
-        $inspect(networksDatacenters[selectedNetId]);
 
         markerState.highlighted = networksDatacenters[selectedNetId];
     });
