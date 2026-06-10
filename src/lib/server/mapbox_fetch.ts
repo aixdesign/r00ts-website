@@ -1,10 +1,10 @@
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 
-import { MAPBOX_API } from '$env/static/private';
+import { MAPBOX_API, AERIAL_DIR } from '$env/static/private';
 
 const MAPBOX_STATIC_URL = "https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static";
-const IMAGE_DIR = 'static/images/aerial';
+let IMAGE_DIR = AERIAL_DIR || 'images/aerial';
 
 export async function fetchSatilliteView(
     lng: number,
@@ -29,7 +29,7 @@ export async function fetchSatilliteView(
     console.log(url);
 
     await mkdir(IMAGE_DIR, { recursive: true });
-    console.log(IMAGE_DIR);
+    console.log(`Saving aerial images to ${IMAGE_DIR}`);
 
     const response = await fetch(url);
     if (!response.ok) {

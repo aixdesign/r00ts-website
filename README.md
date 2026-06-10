@@ -36,6 +36,15 @@ peeringdb config set
 peeringdb sync
 ```
 
+Create a `.env.local` file (which will not tracked by git), and add the
+following variables:
+
+```dotenv
+NETWORKSDB_API=<API_KEY>
+MAPBOX_API=<API_KEY>
+AERIAL_DIR=image/aerial
+```
+
 Start a development server:
 
 ```sh

@@ -11,6 +11,7 @@ node_modules
 
 # Dynamic resources
 static/images/
+image/
 
 # Output
 .output
