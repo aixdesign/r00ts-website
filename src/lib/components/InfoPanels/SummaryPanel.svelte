@@ -51,13 +51,15 @@
         {/if}
         {#if num_datacenters > 0}
             <li>
-                On up to
+                {num_datacenters == 1 ? "From" : "From up to"}
                 <span class="datacenter-stat">
-                    {num_datacenters} datacenters
+                    {num_datacenters}
+                    {num_datacenters == 1 ? "datacenter" : "datacenters"}
                 </span>
             </li>
             <li>
-                Accross <span class="cities-stat"> {cities} </span>
+                {num_datacenters == 1 ? "In" : "Accross"}
+                <span class="cities-stat"> {cities} </span>
             </li>
         {/if}
         {#if time < Infinity}
@@ -69,7 +71,7 @@
         {/if}
         {#if time < 500}
             <li>
-                Which means its roughly
+                Which means it is roughly
                 <span class="distance-stat">
                     within a {distance}km radius
                 </span>
