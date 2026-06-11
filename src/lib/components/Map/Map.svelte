@@ -187,7 +187,6 @@
                 datacenterMarkers.push(
                     addMarker(map, {
                         datacenter: dc,
-                        weather: weatherData[dc.id],
                         zoomState,
                     }),
                 );

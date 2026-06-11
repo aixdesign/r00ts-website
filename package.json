@@ -27,8 +27,10 @@
     "dependencies": {
         "@blackglory/better-sqlite3-migrations": "^0.2.2",
         "better-sqlite3": "^12.9.0",
+        "iconify-icon": "^3.0.2",
         "maplibre-gl": "^5.24.0",
         "migration-files": "^0.4.3",
-        "mime-types": "^3.0.2"
+        "mime-types": "^3.0.2",
+        "openmeteo": "^1.2.3"
     }
 }

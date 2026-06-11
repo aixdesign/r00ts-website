@@ -6,7 +6,8 @@ import maplibregl from "maplibre-gl";
 import type { Datacenter, Weather } from "$lib/types";
 import Marker from "./Marker.svelte";
 
-const base = resolve('/api/aerial/');
+const aerialAPI = resolve('/api/aerial/');
+const weatherAPI = resolve('/api/weather');
 
 export const markerState = $state({
     datacenter: null as Datacenter | null,
@@ -18,15 +19,14 @@ export function addMarker(
     map: maplibregl.Map,
     {
         datacenter,
-        weather,
         zoomState,
     }: {
         datacenter: Datacenter;
-        weather?: Weather;
         zoomState: { value: number }
     },
 ) {
     const datacenterData = $state(datacenter);
+    let weather = $state<{ value: Weather | null }>({ value: null });
 
     async function onclick(e?: MouseEvent) {
         e?.stopPropagation();
@@ -34,12 +34,33 @@ export function addMarker(
         markerState.datacenter = datacenter;
 
         if (datacenterData.filename == null && datacenterData.precise) {
-            fetch(`${base}${datacenter.id}`)
+            fetch(`${aerialAPI}${datacenter.id}`)
                 .then(res => res.json())
                 .then(data => {
                     datacenterData.filename = data.filename;
                 }).catch(err => {
                     console.error(err);
+                })
+        }
+
+        if (weather.value == null) {
+            fetch(weatherAPI, {
+                method: 'POST',
+                body: JSON.stringify({
+                    id: datacenter.id,
+                    lat: datacenter.lat,
+                    lon: datacenter.lon
+                })
+            })
+                .then(res => res.json())
+                .then((data) => {
+                    if (data.message)
+                        throw new Error(data.message);
+
+                    weather.value = data;
+                })
+                .catch(_err => {
+                    console.error(`Error fetching weather for ${datacenter.lat} ${datacenter.lon} `);
                 })
         }
     }
@@ -51,8 +72,8 @@ export function addMarker(
             get zoom() {
                 return zoomState.value;
             },
+            get weather() { return weather.value },
             datacenter: datacenterData,
-            weather,
             onclick
         },
     });

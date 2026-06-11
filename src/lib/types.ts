@@ -89,7 +89,7 @@ export interface PostResult {
 
 export type Weather = {
     weatherCode: number,
-    temp: number,
+    temperature: number,
     timestamp: number
 };
 

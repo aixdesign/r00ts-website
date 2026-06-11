@@ -1,17 +1,18 @@
 <script lang="ts">
     import { resolve } from "$app/paths";
+    import WeatherComponent from "./WeatherComponent.svelte";
     import type { Datacenter, Weather } from "$lib/types";
     import { markerState } from "./marker.svelte";
 
     let {
         zoom = 13,
         datacenter,
-        weather = undefined,
+        weather = null,
         onclick,
     }: {
         zoom: number;
         datacenter: Datacenter;
-        weather?: Weather;
+        weather: Weather | null;
         onclick: (e?: MouseEvent) => void;
     } = $props();
 
@@ -23,7 +24,7 @@
             markerState.preview.includes(datacenter.id),
     );
 
-    const aerial_url = resolve("/images/aerial/");
+    const aerial_url: string = resolve("/images/aerial/");
 </script>
 
 <!-- class:marker-open={open && !zoomed} -->
@@ -41,11 +42,7 @@
         {#if open && !zoomed}
             <div class="title" class:highlighted>
                 <h1>{datacenter.name}</h1>
-                {#if weather}
-                    <div class="weather">
-                        {weather.temp}°C
-                    </div>
-                {/if}
+                <WeatherComponent {weather} />
             </div>
         {/if}
         {#if datacenter.filename && datacenter.precise && !no_preview}
@@ -110,6 +107,9 @@
     }
 
     .title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         box-sizing: border-box;
         position: absolute;
         right: 0;
@@ -117,20 +117,13 @@
         width: 100%;
         background: #ff5f1f;
         padding: 0.8em;
+        padding-bottom: 0;
         overflow: hidden;
     }
 
     h1 {
         font-size: 12pt;
-        margin: 0 auto;
-    }
-
-    .weather {
-        position: absolute;
-        bottom: 100%;
-        right: 0;
-        padding: 0.4em 0.6em;
-        background-color: white;
+        margin: 0;
     }
 
     :global(.datacenter-marker) {
