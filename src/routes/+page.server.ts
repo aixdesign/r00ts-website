@@ -24,7 +24,6 @@ export async function load({ url }) {
             const network_list = getNetworksFromIds(data['network_ids']);
             network_list.map(net => networks[net.id] = net);
             networksDatacenters = data['network_datacenters'];
-            console.log(networksDatacenters);
             ipData = data['entries'];
             pageUrl = data['pageUrl'];
 

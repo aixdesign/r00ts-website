@@ -21,7 +21,7 @@ export type NoteState = {
 
 export interface Network {
     id: number,
-    net_id: number,
+    net_id?: number,
     network_name: string,
     organisation_name: string,
     description: string,
@@ -93,10 +93,22 @@ export type Weather = {
     timestamp: number
 };
 
+
+export type Clue = {
+    type: number,
+    name: string,
+    code?: string
+    regionCode?: string
+    countryCode?: string
+    city?: string
+}
+
+
 export type Entry = {
     ip: string,
     hostname: string,
     count: number,
     durationMs?: number,
     network_id?: number,
+    clue?: Clue
 }

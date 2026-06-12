@@ -26,6 +26,13 @@
                             <td>
                                 <span>[{entry.durationMs}ms]</span>
                             </td>
+                            <td>
+                                {#if entry.clue?.city}
+                                    * {entry.clue.city}
+                                {:else if entry.clue?.code}
+                                    * {entry.clue.code}
+                                {/if}
+                            </td>
                         </tr>
                     {/each}
                 </tbody>

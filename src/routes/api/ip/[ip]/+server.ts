@@ -8,19 +8,9 @@ import { isIpReserved, IPtoInt } from '$lib/server/ip_utils.js';
 export async function GET({ params, url, getClientAddress }) {
     const { ip } = params;
     let country_code = url.searchParams.get('country_code');
+    let city = url.searchParams.get('city') ?? undefined;
 
-    console.log(`[GET] /api/ip/${ip} country_code: ${country_code}`);
-
-    if (!country_code) {
-        const userIP = getClientAddress();
-        const data = await fetch(`http://ip-api.com/json/${userIP}`).then(res => res.json()).catch(err => console.log(err));
-
-        if (data.status === 'fail') {
-            console.log("WARNING: setting default country_code to 'nl'");
-            country_code = 'nl';
-        } else
-            country_code = data.countryCode as string;
-    }
+    console.log(`[GET] /api/ip/${ip} country_code: ${country_code} city: ${city}`);
 
     if (!ip)
         error(400, 'Missing IP address');
@@ -42,17 +32,27 @@ export async function GET({ params, url, getClientAddress }) {
     if (!networkRequest.network?.asn)
         error(500, 'ASN not found for network');
 
-    const facilitiesRequest = await getDatacenters(networkRequest.network.asn, country_code);
+    let user;
+    if (!country_code) {
+        const userIP = getClientAddress();
+        const data = await fetch(`http://ip-api.com/json/${userIP}`).then(res => res.json()).catch(err => console.log(err));
+
+        if (data.status === 'fail') {
+            console.log("WARNING: setting default country_code to 'nl'");
+            country_code = 'nl';
+        } else
+            country_code = data.countryCode as string;
+
+        user = { country_code };
+    }
+
+    const facilitiesRequest = await getDatacenters(networkRequest.network.asn, country_code, city);
 
     if (!facilitiesRequest.success)
         error(500, facilitiesRequest.reason);
 
     if (!facilitiesRequest.facilities)
         error(500, facilitiesRequest.reason);
-
-    const user = {
-        country_code
-    };
 
     return json({ facilities: facilitiesRequest.facilities, network: networkRequest.network, user });
 }

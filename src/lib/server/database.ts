@@ -172,11 +172,15 @@ export async function getNetwork(ip: number | string)
     } else {
 
         const peering_net = getPeeringDBNetwork(asn);
-        if (!peering_net)
-            return { success: false, reason: `Cannot find ${asn} in peeringdb` };
+
+        let peering_net_id;
+        if (peering_net)
+            peering_net_id = peering_net.id;
+        else
+            console.log(`Cannot find ${asn} in peeringdb`);
 
         const network_params = {
-            net_id: peering_net.id,
+            net_id: peering_net_id,
             network_name,
             organisation_name,
             description,
@@ -246,7 +250,7 @@ export async function getDatacenter(id: number) {
     return { success: true, datacenter }
 }
 
-function iterativeSearch(asn: number, country_code?: string): Datacenter[] {
+function iterativeSearch(asn: number, country_code?: string, city?: string): Datacenter[] {
 
     const select_clause = `
         SELECT d.id, d.fac_id, d.name, d.lat, d.lon, d.precise, d.city, d.country_code, d.links, d.last_update FROM Datacenters d
@@ -255,6 +259,7 @@ function iterativeSearch(asn: number, country_code?: string): Datacenter[] {
         WHERE Networks.asn = ?
     `;
     const country_clause = 'AND d.country_code LIKE ?';
+    const city_clause = 'AND ( d.city LIKE ? OR d.name LIKE ?)'; // city might be in name too
 
     let facility_query = [select_clause];
     let facility_query_params: (string | number)[] = [asn];
@@ -264,11 +269,33 @@ function iterativeSearch(asn: number, country_code?: string): Datacenter[] {
         facility_query_params.push(country_code.toUpperCase());
     }
 
+    if (city) {
+        facility_query.push(city_clause);
+        facility_query_params.push(`%${city}%`);
+        facility_query_params.push(`%${city}%`);
+    }
+
     console.log(" - 1 Initial search...");
     let facilities = db.prepare(facility_query.join(' ')).all(facility_query_params) as Datacenter[];
 
+    if (city && facilities.length > 0)
+        console.log('  Found results that matched city!');
+
     if (facilities && facilities.length > 0)
         return facilities;
+
+
+    if (city && country_code) {
+        // Drop city search
+        facility_query = [select_clause, country_clause];
+        facility_query_params = [asn, country_code];
+
+        console.log(" - 1B Trying without city");
+        facilities = db.prepare(facility_query.join(' ')).all(facility_query_params) as Datacenter[];
+
+        if (facilities && facilities.length > 0)
+            return facilities;
+    }
 
     if (!country_code) {
         // First search was already entire world, return empty...
@@ -295,7 +322,7 @@ function iterativeSearch(asn: number, country_code?: string): Datacenter[] {
     return facilities;
 }
 
-export async function getDatacenters(asn: number, country_code?: string)
+export async function getDatacenters(asn: number, country_code?: string, city?: string)
     : Promise<{ success: boolean, reason?: string, facilities?: Datacenter[] }> {
 
     if (!asn)
@@ -311,7 +338,7 @@ export async function getDatacenters(asn: number, country_code?: string)
     // Only search if database is up to date
     const now = Math.floor(Date.now() / 1000);
     if (net.last_update >= now - (7 * 24 * 60 * 60)) {
-        facilities = iterativeSearch(asn, country_code);
+        facilities = iterativeSearch(asn, country_code, city);
         console.log(`Found ${facilities.length} facilities`);
 
         if (facilities && facilities.length > 0) {
@@ -342,7 +369,7 @@ export async function getDatacenters(asn: number, country_code?: string)
         let { latitude, longitude } = fac;
         let precise = 1;
 
-        console.log(`lat/lon: ${latitude} ${longitude}`);
+        // console.log(`lat/lon: ${latitude} ${longitude}`);
 
         if (latitude === null || longitude === null) {
             precise = 0;
@@ -388,7 +415,7 @@ export async function getDatacenters(asn: number, country_code?: string)
     db.prepare('UPDATE Networks SET last_update = ? WHERE id = ?').run(last_update, net.id)
 
     // Now perform iterativeSearch again...
-    facilities = iterativeSearch(asn, country_code);
+    facilities = iterativeSearch(asn, country_code, city);
     console.log(`Found ${facilities.length} facilities`);
 
     return { success: true, facilities };

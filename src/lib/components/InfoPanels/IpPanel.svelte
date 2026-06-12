@@ -37,6 +37,9 @@
 
     const networkIps: { [key: number]: Entry[] } = $derived.by(() => {
         const result: { [key: number]: Entry[] } = {};
+        console.log("Entries:");
+        console.log(entries);
+
         for (const ip of Object.keys(entries)) {
             const entry = entries[ip];
             if (!entry.network_id) continue;
@@ -52,6 +55,9 @@
             });
         }
 
+        console.log("Result:");
+        console.log(result);
+
         return result;
     });
 
@@ -61,22 +67,19 @@
 <div class="wrapper">
     <div class="container">
         <span>[ {pageHostname} ]</span>
-        {#each Object.keys(networkIps) as netId}
+        {#each Object.keys(networkIps).map((k) => parseInt(k)) as netId}
             <div
                 class="entry"
-                class:selected={selectedNetId == parseInt(netId)}
+                class:selected={selectedNetId == netId}
                 onclick={(ev) => {
-                    selectedNetId =
-                        selectedNetId == parseInt(netId)
-                            ? null
-                            : parseInt(netId);
+                    selectedNetId = selectedNetId == netId ? null : netId;
                     entryElement = ev.currentTarget;
                 }}
                 onmouseover={() => {
-                    preview(parseInt(netId));
+                    preview(netId);
                 }}
                 onfocus={() => {
-                    preview(parseInt(netId));
+                    preview(netId);
                 }}
                 onmouseout={() => {
                     preview(null);
@@ -90,9 +93,12 @@
                 onkeydown={() => {}}
             >
                 <span class="net-name">
-                    {networks[parseInt(netId)].network_name}
+                    {networks[netId].network_name}
+                    {#if !networksDatacenters[netId]}
+                        [!]
+                    {/if}
                 </span>
-                {#each networkIps[parseInt(netId)] as entry}
+                {#each networkIps[netId] as entry}
                     <span class="ip">{entry.ip}</span>
                 {/each}
             </div>
