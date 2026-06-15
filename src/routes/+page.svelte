@@ -27,6 +27,7 @@
             <SummaryPanel
                 entries={data.ipData}
                 datacenters={data.datacenters}
+                pageUrl={data.pageUrl}
             />
         {/if}
     </Map>

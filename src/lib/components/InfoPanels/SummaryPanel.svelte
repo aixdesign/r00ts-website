@@ -4,9 +4,10 @@
     interface Props {
         entries: { [key: string]: Entry };
         datacenters: Datacenter[];
+        pageUrl?: string;
     }
 
-    let { entries, datacenters }: Props = $props();
+    let { entries, datacenters, pageUrl }: Props = $props();
 
     let num_ips = $derived(Object.keys(entries).length);
     let num_datacenters = $derived(datacenters.length);
@@ -40,7 +41,7 @@
 </script>
 
 <div class="container">
-    <span>Your session was served by:</span>
+    <span>{pageUrl ?? "The website"} was served by:</span>
     <ul>
         {#if num_ips > 0}
             <li>

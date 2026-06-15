@@ -29,12 +29,6 @@
         markerState.highlighted = networksDatacenters[selectedNetId];
     });
 
-    const pageHostname = $derived.by(() => {
-        if (pageUrl) return new URL(pageUrl).hostname;
-
-        return null;
-    });
-
     const networkIps: { [key: number]: Entry[] } = $derived.by(() => {
         const result: { [key: number]: Entry[] } = {};
         console.log("Entries:");
@@ -66,7 +60,7 @@
 
 <div class="wrapper">
     <div class="container">
-        <span>[ {pageHostname} ]</span>
+        <span>[ {pageUrl ?? "unknown"} ]</span>
         {#each Object.keys(networkIps).map((k) => parseInt(k)) as netId}
             <div
                 class="entry"
