@@ -3,6 +3,7 @@
     import WeatherComponent from "./WeatherComponent.svelte";
     import type { Datacenter, Weather } from "$lib/types";
     import { markerState } from "./marker.svelte";
+    import DataPanel from "../InfoPanels/DataPanel.svelte";
 
     let {
         zoom = 13,
@@ -27,7 +28,6 @@
     const aerial_url: string = resolve("/images/aerial/");
 </script>
 
-<!-- class:marker-open={open && !zoomed} -->
 <div class="marker-root" class:front={open}>
     <div
         class="marker"
@@ -44,6 +44,8 @@
                 <h1>{datacenter.name}</h1>
                 <WeatherComponent {weather} />
             </div>
+
+            <DataPanel {datacenter} />
         {/if}
         {#if datacenter.filename && datacenter.precise && !no_preview}
             <img

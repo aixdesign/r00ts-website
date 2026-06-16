@@ -457,9 +457,6 @@ export function getDatacentersFromIds(ids: number[]): Datacenter[] {
             break;
     }
 
-    // const networks = db.prepare(`SELECT * FROM Networks n JOIN NetworksDatacenters nd ON nd.network_id = n.id WHERE nd.datacenter_id IN (${placeholder}) GROUP BY n.id`).all(ids) as Network[];
-    // console.log(networks);
-
     return datacenters;
 }
 

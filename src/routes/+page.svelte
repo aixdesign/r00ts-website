@@ -1,10 +1,17 @@
 <script lang="ts">
-    import DataPanel from "$lib/components/InfoPanels/DataPanel.svelte";
     import IpPanel from "$lib/components/InfoPanels/IpPanel.svelte";
     import SummaryPanel from "$lib/components/InfoPanels/SummaryPanel.svelte";
     import Map from "$lib/components/Map/Map.svelte";
 
+    import { dataState } from "$lib/components/InfoPanels/data.svelte.js";
+
     const { data } = $props();
+
+    $effect(() => {
+        dataState.networks = data.networks;
+        dataState.networksDatacenters = data.networksDatacenters;
+        dataState.entries = data.ipData;
+    });
 </script>
 
 <div class="contents">
@@ -13,10 +20,6 @@
         showDebug={data.showDebug}
         leftPadding={data.ipData ? 500 : 100}
     >
-        <DataPanel
-            entries={data.ipData}
-            networksDatacenters={data.networksDatacenters}
-        />
         {#if data.ipData}
             <IpPanel
                 entries={data.ipData}
