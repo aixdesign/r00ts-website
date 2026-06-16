@@ -147,8 +147,6 @@
 
         syncMaps(map, mapBuildingsLayer);
 
-        fitAll();
-
         mapCanvas = map.getCanvas();
         mapCanvas.style.opacity = "0";
 
@@ -170,11 +168,11 @@
             rasteriser?.renderGlyphs();
         });
 
-        map.on("load", () => {
-            map.on("zoom", () => {
-                zoomState.value = map.getZoom();
-            });
+        map.on("zoom", () => {
+            zoomState.value = map.getZoom();
+        });
 
+        map.on("load", () => {
             new ResizeObserver(() =>
                 rasteriser?.resize(mapCanvas.width, mapCanvas.height),
             ).observe(mapCanvas);
@@ -196,6 +194,8 @@
                 );
             });
         }
+
+        fitAll();
     });
 
     onDestroy(() => {
