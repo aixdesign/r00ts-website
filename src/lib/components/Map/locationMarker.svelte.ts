@@ -8,6 +8,8 @@ let component: { $set?: any, $get?: any };
 
 export let showLocation = $state({ value: false });
 
+let follow = true;
+
 function success(map: maplibregl.Map, position: GeolocationPosition) {
     // Success
     if (!locationMarker) {
@@ -30,6 +32,12 @@ function success(map: maplibregl.Map, position: GeolocationPosition) {
             window.navigator.geolocation.clearWatch(watchId);
         });
 
+        follow = true;
+
+        map.once('dragstart', () => {
+            follow = false;
+        });
+
         map.flyTo({
             center: locationMarker.getLngLat(),
             zoom: 12,
@@ -40,6 +48,12 @@ function success(map: maplibregl.Map, position: GeolocationPosition) {
             position.coords.longitude,
             position.coords.latitude,
         ]);
+
+        if (follow)
+            map.jumpTo({
+                center: locationMarker.getLngLat(),
+                zoom: 12,
+            });
     }
 }
 
