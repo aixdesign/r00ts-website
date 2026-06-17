@@ -33,7 +33,6 @@
 
     const networkIps: { [key: number]: Entry[] } = $derived.by(() => {
         const result: { [key: number]: Entry[] } = {};
-        $inspect(dataState.entries);
 
         for (const ip of Object.keys(dataState.entries)) {
             const entry = dataState.entries[ip];
@@ -51,8 +50,6 @@
                 return a.ip < b.ip ? -1 : 1;
             });
         }
-
-        $inspect(result);
 
         return result;
     });

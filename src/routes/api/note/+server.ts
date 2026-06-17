@@ -9,7 +9,7 @@ export async function GET({ url }) {
         note_id = parseInt(search_note_id);
 
     const search_datacenter_id = url.searchParams.get('datacenter_id');
-    console.log(search_datacenter_id);
+    //console.log(search_datacenter_id);
     let datacenter_id;
     if (search_datacenter_id != null)
         datacenter_id = parseInt(search_datacenter_id);

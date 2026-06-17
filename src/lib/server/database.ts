@@ -442,7 +442,7 @@ export function getDatacentersFromIds(ids: number[]): Datacenter[] {
         if (dc.filename)
             continue;
 
-        console.log('getDatacentersFromIds dc.filename is undefined, fetching aerial view...');
+        //console.log('getDatacentersFromIds dc.filename is undefined, fetching aerial view...');
         fetchSatilliteView(dc.lon, dc.lat).then(res => {
             if (!res.success || !res.filename)
                 return;
@@ -467,8 +467,8 @@ export async function getDatacenterAerialImage(id: number): Promise<string | nul
         if (filename)
             return filename;
 
-        console.log(filename);
-        console.log(`getDatacenterAerialImage filename from db for id ${id} is not defined. Fetching aerial view...`);
+        //console.log(filename);
+        //console.log(`getDatacenterAerialImage filename from db for id ${id} is not defined. Fetching aerial view...`);
         const res = await fetchSatilliteView(lon, lat);
         if (!res.success || !res.filename)
             return null;

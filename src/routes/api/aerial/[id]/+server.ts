@@ -4,7 +4,7 @@ import { json, error } from '@sveltejs/kit'
 export async function GET({ params }) {
     const { id } = params;
 
-    console.log(`[GET] /api/aerial/${id}`);
+    //console.log(`[GET] /api/aerial/${id}`);
 
     if (id === null || id === undefined || id === '')
         error(400, 'Missing id');

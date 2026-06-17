@@ -38,7 +38,6 @@ export async function fetchSatilliteView(
     }
 
     const filename = `${crypto.randomUUID()}.png`;
-    console.log(filename);
 
     const buffer = Buffer.from(await response.arrayBuffer());
     const filepath = join(IMAGE_DIR, filename);
