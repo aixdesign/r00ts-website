@@ -6,6 +6,7 @@
     import Map from "$lib/components/Map/Map.svelte";
 
     import { dataState } from "$lib/components/InfoPanels/data.svelte.js";
+    import AboutPanel from "$lib/components/InfoPanels/AboutPanel.svelte";
 
     const { data } = $props();
 
@@ -30,6 +31,7 @@
                 pageUrl={data.pageUrl}
             />
         {/if}
+        <AboutPanel />
     </Map>
 </div>
 

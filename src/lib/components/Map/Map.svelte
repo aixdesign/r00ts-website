@@ -227,15 +227,17 @@
     {#if showDebug}
         <DebugPanel {rasteriser} {mapBuildingsStyle} {setBuildingStyle} />
     {/if}
-    <button class="fit-btn" onclick={() => fitAll(true)}>fit all</button>
 
-    {#if "geolocation" in navigator}
-        <button
-            class="locate-btn"
-            class:locating={showLocation.value}
-            onclick={() => getUserLocation(map)}>locate</button
-        >
-    {/if}
+    <div class="controls">
+        <button class="fit-btn" onclick={() => fitAll(true)}>fit all</button>
+        {#if "geolocation" in navigator}
+            <button
+                class="locate-btn"
+                class:locating={showLocation.value}
+                onclick={() => getUserLocation(map)}>locate</button
+            >
+        {/if}
+    </div>
     {@render children?.()}
 </div>
 
@@ -262,25 +264,23 @@
         pointer-events: none;
     }
 
+    .controls {
+        position: absolute;
+        bottom: 1em;
+        right: 1em;
+        display: flex;
+        flex-direction: column;
+    }
+
     .locate-btn,
     .fit-btn {
-        position: absolute;
+        margin: 0.2em;
         border: none;
         cursor: pointer;
         font-family: "JetBrains Mono", monospace;
         font-weight: 600;
         font-size: 16pt;
         z-index: 3;
-    }
-
-    .fit-btn {
-        top: 1em;
-        right: 1em;
-    }
-
-    .locate-btn {
-        bottom: 1em;
-        right: 1em;
     }
 
     .locating {
