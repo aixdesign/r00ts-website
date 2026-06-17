@@ -26,8 +26,8 @@ export async function POST({ request }) {
 
         const weatherURL = "https://api.open-meteo.com/v1/forecast";
 
-        console.log("Fetching weather...");
-        console.log(`${weatherURL}?${new URLSearchParams(params).toString()}`);
+        // console.log("Fetching weather...");
+        // console.log(`${weatherURL}?${new URLSearchParams(params).toString()}`);
 
         try {
             const response = await fetchWeatherApi(weatherURL, params, 3, 0.2, 2, fetchOptions);
@@ -36,7 +36,12 @@ export async function POST({ request }) {
             const weatherCode = current?.variables(0)!.value();
             const temperature = current?.variables(1)!.value();
 
-            console.log(weatherCode, temperature?.toFixed(2));
+            if (temperature && weatherCode != undefined)
+                weatherCache[id] = {
+                    timestamp: now,
+                    temperature: temperature,
+                    weatherCode
+                };
 
             return json({
                 time: now,
@@ -51,31 +56,8 @@ export async function POST({ request }) {
             return error(500);
         }
 
-
-        // const weatherURL = `https://api.open-meteo.com/v1/forecast?${params}`;
-        // console.log("weather url:", weatherURL);
-        //
-        // try {
-        //     const res = await fetch(weatherURL);
-        //     const data = await res.json();
-        //     const weather: Weather = {
-        //         timestamp: now,
-        //         temp: data.current.temperature_2m,
-        //         weatherCode: data.current.weather_code
-        //     }
-        //
-        //     weatherCache[id] = weather;
-        //     return json(weather);
-        // } catch (err) {
-        //     console.error(err)
-        //     return error(500, 'cannot get weather');
-        // }
-        //
-        return json({});
-
     } else {
-        console.log(`weatherCache hit for id ${id}`);
-        //kweatherResults[id] = weatherCache[id];
+        //console.log(`weatherCache hit for id ${id}`);
 
         return json(weatherCache[id]);
     }
