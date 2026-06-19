@@ -1,4 +1,7 @@
 import adapter from '@sveltejs/adapter-node';
+import { config as loadEnv } from 'dotenv';
+
+loadEnv({ path: '.env.local' });
 
 const baseDir = process.env.BASE_URL || '';
 

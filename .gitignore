@@ -36,6 +36,9 @@ Thumbs.db
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
+# pm2
+ecosystem.config.*
+
 # python
 venv/
 __pycache__/
