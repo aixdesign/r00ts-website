@@ -1,11 +1,28 @@
 <script lang="ts">
     import { glyphState, glyphSize } from "./glyphState.svelte.ts";
     import { colourToString } from "./utils.ts";
-    import { GLYPH_FUNCTIONS } from "./glyphRenderer.ts";
+    import { GLYPH_FUNCTIONS, MapRaseriser } from "./glyphRenderer.ts";
+    import { onMount } from "svelte";
 
-    let { rasteriser, mapBuildingsStyle, setBuildingStyle } = $props();
+    interface Props {
+        rasteriser: MapRaseriser;
+        mapBuildingsStyle: any;
+        setBuildingStyle: (
+            style: maplibregl.StyleSpecification | string,
+        ) => void;
+    }
+
+    let { rasteriser, mapBuildingsStyle, setBuildingStyle }: Props = $props();
 
     let debugShow = $state(false);
+
+    let glyphPalletteCanvas: HTMLCanvasElement;
+    let offscreenCanvas: HTMLCanvasElement;
+
+    onMount(() => {
+        rasteriser.setOffscreenCanvas(offscreenCanvas);
+        rasteriser.rasterPalette.setGlyphPalletteCanvas(glyphPalletteCanvas);
+    });
 </script>
 
 <div
@@ -16,6 +33,8 @@
         {debugShow ? "Hide" : "Show"}
     </button>
     <div class="horizontal">
+        <canvas class="mapPreview" bind:this={offscreenCanvas}></canvas>
+        <canvas class="glyphPreview" bind:this={glyphPalletteCanvas}></canvas>
         <table>
             <tbody>
                 {#each glyphState as gs}
@@ -107,6 +126,14 @@
 </div>
 
 <style>
+    .mapPreview {
+        height: 200px;
+    }
+
+    .glyphPreview {
+        height: 100px;
+    }
+
     #debug-view {
         position: fixed;
         bottom: 1.6em;

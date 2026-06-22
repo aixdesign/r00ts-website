@@ -224,7 +224,7 @@
         id="glyph-render"
     >
     </canvas>
-    {#if showDebug}
+    {#if showDebug && rasteriser}
         <DebugPanel {rasteriser} {mapBuildingsStyle} {setBuildingStyle} />
     {/if}
 

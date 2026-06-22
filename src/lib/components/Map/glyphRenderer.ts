@@ -9,7 +9,6 @@ export const GLYPH_FUNCTIONS: { name: string, fn: GlyphDrawFn }[] = [
         name: "blank",
         fn: (_ctx, _s, _fg) => { }
     },
-
     {
         name: "line_h",
         fn: (ctx, s, fg) => {
@@ -187,6 +186,14 @@ export class RasteriserPalette {
         this.renderGlyphPalette();
     }
 
+    setGlyphPalletteCanvas(glyphPaletteCanvas: HTMLCanvasElement) {
+        this.glyphPaletteCanvas = glyphPaletteCanvas;
+        this.glyphPaletteCtx = this.glyphPaletteCanvas.getContext('2d');
+
+        this.setGlyphSize(this.glyphSize);
+        this.renderGlyphPalette();
+    }
+
     addGlyph(glyphName: string, drawFn: GlyphDrawFn) {
         this.glyphFunctions[glyphName] = drawFn;
     }
@@ -226,6 +233,8 @@ export class RasteriserPalette {
             const { glyphName, fg, bg } = entry;
             entry.canvas = createGlyph(this.glyphSize, this.glyphFunctions[glyphName], fg, bg);
         }
+
+        this.glyphCache.clear();
 
         this.renderGlyphPalette();
     }
@@ -298,6 +307,15 @@ export class MapRaseriser {
         this.resize();
     }
 
+    setOffscreenCanvas(offscreenCanvas: HTMLCanvasElement) {
+        this.offscreenCanvas = offscreenCanvas;
+        this.offscreenCtx = this.offscreenCanvas.getContext('2d');
+        if (this.offscreenCtx)
+            this.offscreenCtx.imageSmoothingEnabled = false;
+
+        this.resize();
+    }
+
     resize(width?: number, height?: number) {
         // TODO: keep canvas size same but change glyphOverlayCtx.scale to dpr?
         const dpr = window.devicePixelRatio || 1;
@@ -319,6 +337,7 @@ export class MapRaseriser {
     renderGlyphs() {
         if (this.offscreenCtx == null || this.glyphOverlayCtx == null) return;
 
+        this.glyphOverlayCtx.clearRect(0, 0, this.glyphOverlayCanvas.width, this.glyphOverlayCanvas.height);
         this.offscreenCtx.drawImage(this.mapCanvas, 0, 0, this.cols, this.rows);
         const { data } = this.offscreenCtx.getImageData(0, 0, this.cols, this.rows);
         const pixels = new Uint32Array(data.buffer);
