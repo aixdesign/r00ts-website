@@ -1,4 +1,6 @@
 <script lang="ts">
+    import Button from "../Button.svelte";
+
     let show = $state(false);
 
     function onclick() {
@@ -6,7 +8,9 @@
     }
 </script>
 
-<button class="about-btn" {onclick}>about</button>
+<div class="button-container">
+    <Button {onclick}>about</Button>
+</div>
 
 <div class="container" class:hidden={!show}>
     <div class="panel">
@@ -58,10 +62,11 @@
         font-family: inherit;
     }
 
-    .about-btn {
+    .button-container {
         position: absolute;
         top: 1em;
         right: 1em;
+        z-index: 5;
     }
 
     .close-btn {

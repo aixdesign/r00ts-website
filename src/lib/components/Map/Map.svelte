@@ -19,6 +19,7 @@
         getUserLocation,
         showLocation,
     } from "./locationMarker.svelte.ts";
+    import Button from "../Button.svelte";
 
     let mapContainer: HTMLDivElement;
     let mapBuildingsContainer: HTMLDivElement;
@@ -229,13 +230,14 @@
     {/if}
 
     <div class="controls">
-        <button class="fit-btn" onclick={() => fitAll(true)}>fit all</button>
+        <Button onclick={() => fitAll(true)}>fit all</Button>
         {#if "geolocation" in navigator}
-            <button
-                class="locate-btn"
-                class:locating={showLocation.value}
-                onclick={() => getUserLocation(map)}>locate</button
+            <Button
+                highlight={showLocation.value}
+                onclick={() => getUserLocation(map)}
             >
+                locate
+            </Button>
         {/if}
     </div>
     {@render children?.()}
@@ -270,20 +272,6 @@
         right: 1em;
         display: flex;
         flex-direction: column;
-    }
-
-    .locate-btn,
-    .fit-btn {
-        margin: 0.2em;
-        border: none;
-        cursor: pointer;
-        font-family: "JetBrains Mono", monospace;
-        font-weight: 600;
-        font-size: 16pt;
-        z-index: 3;
-    }
-
-    .locating {
-        color: #ff5f1f;
+        z-index: 5;
     }
 </style>
