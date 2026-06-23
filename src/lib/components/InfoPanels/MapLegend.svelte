@@ -50,7 +50,6 @@
         border: 1px black solid;
         display: flex;
         flex-wrap: wrap;
-        width: 100%;
     }
 
     canvas {

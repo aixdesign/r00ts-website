@@ -50,7 +50,6 @@
 
 <div class="wrapper">
     <div class="container">
-        <!-- <span>[ {pageUrl ?? "unknown"} ]</span> -->
         {#each Object.keys(networkIps).map((k) => parseInt(k)) as netId}
             <div
                 class="entry"
@@ -85,9 +84,11 @@
                         {/if}
                     {/if}
                 </span>
-                {#each networkIps[netId] as entry}
-                    <span class="ip">{padIp(entry.ip)}</span>
-                {/each}
+                <div class="ip-list">
+                    {#each networkIps[netId] as entry}
+                        <span class="ip">{padIp(entry.ip)}</span>
+                    {/each}
+                </div>
             </div>
         {/each}
     </div>
@@ -98,14 +99,14 @@
     .wrapper {
         position: absolute;
         left: 1em;
-        top: 2em;
+        top: 5em;
         z-index: 10;
         display: flex;
         max-height: 60%;
     }
 
     .container {
-        background: #e7e7e7;
+        background: white;
         display: flex;
         overflow-y: scroll;
         flex-direction: column;
@@ -127,7 +128,7 @@
         font-weight: inherit;
         font-size: inherit;
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         padding: 0 1em;
         background: inherit;
     }
@@ -136,6 +137,12 @@
         position: sticky;
         top: 0px;
         background: inherit;
+        width: 8em;
+    }
+
+    .ip-list {
+        display: flex;
+        flex-direction: column;
     }
 
     .selected,

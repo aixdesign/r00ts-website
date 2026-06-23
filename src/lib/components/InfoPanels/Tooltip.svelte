@@ -4,9 +4,9 @@
 
     interface Props {
         children: any;
-        colour?: string;
+        background?: string;
     }
-    let { children, colour }: Props = $props();
+    let { children, background }: Props = $props();
 
     let id = Symbol();
     const tooltipState = getTooltipState();
@@ -32,6 +32,7 @@
         tooltipState.toggle(id);
     }}
     bind:this={element}
+    style:background
 >
     (?)
 </button>
@@ -41,7 +42,7 @@
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
         class="tooltip"
-        style:background={colour}
+        style:background
         style:left
         style:bottom
         class:above={tooltipState.active == id}

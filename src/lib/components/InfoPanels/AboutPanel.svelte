@@ -6,31 +6,65 @@
 
     let show = $state(false);
 
-    function onclick() {
+    function toggle() {
         show = !show;
         markerState.datacenter = null;
     }
 </script>
 
 <div class="button-container">
-    <Button {onclick}>about</Button>
+    <Button onclick={toggle}>About</Button>
 </div>
 
 <div class="container" class:hidden={!show}>
+    <button class="close-btn" onclick={() => (show = !show)}>X</button>
     <div class="panel">
-        <button class="close-btn" {onclick}>X</button>
-        <h1>About r00ts</h1>
         <p>
-            r00ts connects the websites you visit to the datacenters that
-            faciltate them.
+            <b>
+                We went looking for where each URL lives IRL. Turns out, it's
+                not one address, but many.
+            </b>
         </p>
         <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Placeat,
-            dignissimos soluta itaque dicta unde ullam dolor corrupti veritatis
-            modi quo a, provident atque expedita quod. Similique aspernatur quam
-            facere omnis?
+            A single webpage pulls from data centers all over — some near(ish)
+            you, some hundreds of kms away.
         </p>
+        <p>
+            r00ts traces your browser session back to those places. So the next
+            time you hear about data center droughts, land rights battles, or
+            the communities pushing back, you can find out if you're part of
+            their story too.
+        </p>
+        <h3>Team</h3>
+        <p>r00ts was created by AIxDESIGN including:</p>
+        <ul>
+            <li>Ploipailin Flynn, Research Lead</li>
+            <li>Arran Lyon, Researcher + Developer</li>
+            <li>Andrea Albiac Casado, Designer</li>
+        </ul>
+        <p>with generous support from Stimuleringsfonds.</p>
+
+        <h3>We're still digging</h3>
+        <p>
+            Everything we've found so far lives on a public Miro board: notes,
+            sources, loose threads, dead ends and all. Have a poke around, add
+            what you know, tell us what we've missed.
+        </p>
+        <p>
+            [ <a href="https://miro.com/app/board/uXjVGCwJpO8=/">
+                Browse the research board
+            </a> ]
+        </p>
+
+        <p>
+            And this August, we're hosting an open community session to shape
+            where r00ts goes next. Whether you've got a data center story, a
+            technical lead, or just good questions — pull up a chair.
+        </p>
+        <p>[ Sign up for the August workshop ]</p>
+
         <hr />
+        <p>Map Legend:</p>
         <MapLegend />
         <p>
             Map data: <a href="https://openfreemap.org/" target="_blank">
@@ -53,6 +87,11 @@
 </div>
 
 <style>
+    a,
+    a:visited {
+        color: blue;
+    }
+
     .container,
     .panel {
         width: 450px;
@@ -69,12 +108,12 @@
     }
 
     .panel {
-        position: relative;
         background-color: white;
+        position: relative;
         padding: 1.5em;
-        max-height: 100%;
-        display: flex;
-        flex-direction: column;
+        margin-top: 3em;
+        height: calc(100% - 3em);
+        overflow-y: scroll;
         box-sizing: border-box;
     }
 
@@ -99,11 +138,16 @@
 
     .close-btn {
         position: absolute;
+        color: white;
+        background: black;
         top: 0;
-        right: 0;
+        left: 0;
+        aspect-ratio: 1;
+        width: 3em;
+        box-sizing: border-box;
     }
 
     hr {
-        width: 100%;
+        margin: 1em 0em;
     }
 </style>
