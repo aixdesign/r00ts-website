@@ -86,8 +86,15 @@
         {/if}
         {#if datacenter.precise}
             <div>
-                <span>Lat: {datacenter.lat}</span>
-                <span>Lon: {datacenter.lon}</span>
+                <a
+                    href="https://maps.google.com/maps?q=&layer=c&cbll={datacenter.lat},{datacenter.lon}"
+                    target="_blank"
+                    rel="noopener"
+                    title="Open in Google Street view (new window)"
+                >
+                    <span>Lat: {datacenter.lat}</span>
+                    <span>Lon: {datacenter.lon}</span>
+                </a>
             </div>
         {/if}
         <p>City: {datacenter.city}</p>
