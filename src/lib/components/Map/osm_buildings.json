@@ -66,7 +66,7 @@
                 "text-pitch-alignment": "map",
                 "text-field": "{name:en}",
                 "text-font": [
-                    "Jetbrans Mono",
+                    "GT Pressura Mono",
                     "monospace"
                 ]
             },
@@ -93,7 +93,7 @@
                 "text-pitch-alignment": "map",
                 "text-field": "{name:en}",
                 "text-font": [
-                    "Jetbrans Mono",
+                    "GT Pressura Mono",
                     "monospace"
                 ]
             },

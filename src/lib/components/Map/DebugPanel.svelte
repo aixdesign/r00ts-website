@@ -147,7 +147,6 @@
         display: flex;
         align-items: center;
         gap: 1em;
-        font-family: monospace;
         font-size: 8pt;
     }
 </style>

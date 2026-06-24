@@ -73,7 +73,6 @@
 
 <style>
     .container {
-        font-weight: 600;
         font-size: 16pt;
         text-align: left;
         white-space: nowrap;

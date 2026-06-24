@@ -54,7 +54,6 @@
 
     button {
         border: none;
-        font-weight: 600;
         font-size: inherit;
         font-family: inherit;
         padding: 0;

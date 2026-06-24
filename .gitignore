@@ -13,6 +13,9 @@ node_modules
 static/images/
 image/
 
+# Fonts
+static/fonts/*
+
 # Output
 .output
 .vercel

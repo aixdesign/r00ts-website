@@ -18,8 +18,8 @@
         background: white;
         padding: 0.2em 0.4em;
         cursor: pointer;
-        font-family: "JetBrains Mono", monospace;
-        font-weight: 600;
+        font-family: "GT Pressura Mono", monospace;
+        font-weight: lighter;
         font-size: 16pt;
         margin: 0.2em;
     }

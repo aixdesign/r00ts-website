@@ -2,6 +2,7 @@
     import type { Datacenter } from "$lib/types";
     import { dataState } from "./data.svelte";
     import Tooltip from "./Tooltip.svelte";
+    import { padIp } from "$lib/ip_utils";
 
     interface Props {
         datacenter: Datacenter;
@@ -185,7 +186,7 @@
             <p>Potentially served:</p>
             <div class="ip-list">
                 {#each ips as ip}
-                    <span class="indent">{ip}</span>
+                    <span class="indent">{padIp(ip)}</span>
                 {/each}
             </div>
         {/if}
@@ -235,5 +236,6 @@
         overflow-y: scroll;
         display: flex;
         flex-direction: column;
+        white-space-collapse: preserve-spaces;
     }
 </style>

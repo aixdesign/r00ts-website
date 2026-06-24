@@ -56,6 +56,16 @@ npm run dev -- --open
 
 ## Building
 
+### Fonts
+
+`r00ts.xyz` makes use [GT
+Pressura](https://www.grillitype.com/typeface/gt-pressura). Due to licensing
+terms, the font files are _not_ included in this repo. Either download and
+install a copy of these fonts into `static/fonts/GT-Pressura`, use your own and
+update the styles througout, or let the default fallback fonts be used.
+
+### Production
+
 To create a production version of the app:
 
 ```sh
@@ -64,5 +74,26 @@ npm run build
 
 You can preview the production build with `npm run preview`.
 
-> To deploy the app, you may need to install an
-> [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+## Deploying
+
+Using `pm2`, create an `ecosystem.config.cjs` file with the following:
+
+```js
+module.exports = {
+  apps: [
+    {
+      name: "r00ts-website",
+      script: "/usr/local/bin/node",
+      args: "build",
+      env: {
+        NODE_ENV: "production",
+        PORT: "3434",
+        ADDRESS_HEADER: "X-Forwarded-For",
+        XFF_DEPTH: "1",
+      },
+    },
+  ],
+};
+```
+
+Then run `$ pm2 start ecosystem.config.cjs`

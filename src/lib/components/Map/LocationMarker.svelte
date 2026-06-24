@@ -6,7 +6,7 @@
 <style>
     .location-marker {
         padding: 0.4em;
-        font-family: "Jetbrains Mono", monospace;
+        font-family: "GT Pressura Mono", monospace;
         font-size: 12pt;
         background-color: blue;
         pointer-events: none;

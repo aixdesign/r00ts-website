@@ -104,7 +104,7 @@
     .wrapper {
         position: absolute;
         left: 1em;
-        top: 5em;
+        top: 6em;
         z-index: 10;
         display: flex;
         max-height: 60%;
@@ -115,13 +115,12 @@
         display: flex;
         overflow-y: scroll;
         flex-direction: column;
-        font-family: "JetBrains Mono", monospace;
-        font-weight: 600;
         font-size: 16pt;
     }
 
     .ip {
         text-align: right;
+        white-space-collapse: preserve-spaces;
     }
 
     .entry {
