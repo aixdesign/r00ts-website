@@ -16,9 +16,15 @@
         dataState.networks = data.networks;
         dataState.networksDatacenters = data.networksDatacenters;
         dataState.entries = data.entries;
+
+        firstVisit = !sessionStorage.getItem("hasVisited");
+        sessionStorage.setItem("hasVisited", "true");
     });
 
     let datacenters: Datacenter[] = $derived(data.datacenters);
+
+    let firstVisit = $state(false);
+    let inSession: boolean = $derived(data.entries ? true : false);
 </script>
 
 <div class="contents">
@@ -27,7 +33,7 @@
         showDebug={data.showDebug}
         leftPadding={data.entries ? 500 : 100}
     >
-        {#if data.entries}
+        {#if inSession}
             <SessionPanel hostname={data.pageUrl} />
             <IpPanel />
             <SummaryPanel
@@ -36,15 +42,13 @@
                 pageUrl={data.pageUrl}
             />
         {:else}
-            <a
-                href="https://github.com/al165/r00ts-extension/releases/tag/v0.5"
-            >
+            <a href="https://github.com/al165/r00ts-extension/releases/latest">
                 <button id="r00ts-download-btn">
                     Download the extension (Firefox and Chrome!)
                 </button>
             </a>
         {/if}
-        <AboutPanel />
+        <AboutPanel show={firstVisit && !inSession} />
     </Map>
 </div>
 

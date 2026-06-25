@@ -1,10 +1,13 @@
 <script lang="ts">
-    import Button from "../Button.svelte";
-
     import { markerState } from "$lib/components/Map/marker.svelte";
+    import Button from "../Button.svelte";
     import MapLegend from "./MapLegend.svelte";
 
-    let show = $state(false);
+    interface Props {
+        show: boolean;
+    }
+
+    let { show }: Props = $props();
 
     function toggle() {
         show = !show;
