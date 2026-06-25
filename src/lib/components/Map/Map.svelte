@@ -131,21 +131,6 @@
         }
     });
 
-    // $effect(() => {
-    //     if (map && datacenters?.length) {
-    //         datacenters.forEach((dc) => {
-    //             datacenterMarkers.push(
-    //                 addMarker(map, {
-    //                     datacenter: dc,
-    //                     zoomState,
-    //                 }),
-    //             );
-    //         });
-    //     }
-    //
-    //     fitAll();
-    // });
-
     onMount(() => {
         mapBuildingsLayer = new maplibregl.Map({
             container: mapBuildingsContainer,
@@ -180,8 +165,6 @@
             glyphPaletteCanvas,
             glyphSize.value,
         );
-
-        // map.addControl(new maplibregl.NavigationControl());
 
         map.on("render", () => {
             rasteriser?.renderGlyphs();
@@ -295,8 +278,14 @@
         <Button onclick={() => fitAll(true)}>Fit all</Button>
         <div class="horizontal">
             <Tooltip position={TooltipPositions.UPPER_LEFT}>
-                Drag the sticker to indicate your location, or click "Locate" to
-                estimate your location.
+                <p>
+                    Drag the sticker to indicate your location, or click
+                    "Locate" to estimate your location.
+                </p>
+                <p>
+                    This uses your browser's location services, which requires
+                    your permission, and might not be accurate on desktop.
+                </p>
             </Tooltip>
             {#if "geolocation" in navigator}
                 <Button

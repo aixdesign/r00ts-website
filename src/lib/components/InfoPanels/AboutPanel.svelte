@@ -63,6 +63,28 @@
         </p>
         <p>[ Sign up for the August workshop ]</p>
 
+        <h3>Privacy</h3>
+        <p>
+            <em>r00ts.xyz</em> does not record your browsing history nor collect
+            <b>any</b> information about your browsing habits or your access to the
+            site. We do not use any cookies or tracking technologies. If you use
+            the "Locate" feature, this information stays within your broswer and
+            we do not see it.
+        </p>
+
+        <p>
+            <em>r00ts</em> browser extension, by it's very nature, records the
+            IP addresses of all web traffic of the webpage in the tab it is open
+            in. <em>Only</em> these IP addresses are sent to our server for the
+            sole purpose of looking up who owns the IP block, and therefore the
+            datacenters that might facilitate the address. The extension
+            <em>does not</em> send the website or URLs that connect to the
+            address, nor send any other identifiable information that can be
+            linked to a user or browsing session. The server <em>does</em> check
+            the country of origin of your own IP address to better narrow down the
+            list of possible datacenters, however this information is not recorded.
+        </p>
+
         <hr />
         <p>Map Legend:</p>
         <MapLegend />
@@ -81,6 +103,14 @@
                 ©Mapbox
             </a>
             <a href="https://www.maxar.com" target="_blank"> ©Maxar </a>
+        </p>
+        <p>
+            Font: GT Pressura Mono (Light, Regular, Bold) from <a
+                href="https://www.grillitype.com/"
+                target="_blank"
+            >
+                Grilli Type
+            </a>
         </p>
         <p>©2026 AIxDESIGN</p>
     </div>
