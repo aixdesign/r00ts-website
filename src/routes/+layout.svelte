@@ -62,7 +62,7 @@
     h1 {
         font-weight: lighter;
         font-size: 64pt;
-        padding: 0em 1em;
+        padding: 0 0.4em;
         margin: 0em;
         user-select: none;
     }
@@ -70,5 +70,6 @@
     nav {
         position: fixed;
         z-index: 100;
+        pointer-events: none;
     }
 </style>

@@ -72,4 +72,10 @@
         border: none;
         cursor: pointer;
     }
+
+    @media (width < 720px) {
+        #r00ts-download-btn {
+            display: none;
+        }
+    }
 </style>

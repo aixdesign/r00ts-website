@@ -100,12 +100,16 @@
         if (markerState.datacenter == null) {
             map?.easeTo({ padding: { right: 0 }, duration: 1000 });
         } else {
+            let right = 175;
+            if (window.innerWidth < 720) right = 0;
+
             map?.flyTo({
                 zoom: 16,
                 center: [
                     markerState.datacenter.lon,
                     markerState.datacenter.lat,
                 ],
+                padding: { right },
                 duration: 1000,
             });
         }

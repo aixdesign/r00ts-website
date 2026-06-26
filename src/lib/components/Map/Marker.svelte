@@ -56,9 +56,9 @@
         {:else if open && !datacenter.precise && !zoomed && !no_preview}
             <div class="caption">
                 <span>
-                    Exact location unknown! All we know is that it is in <em
-                        >{datacenter.city}</em
-                    >. Help us find it's address!
+                    Exact location unknown! All we know is that it is in <em>
+                        {datacenter.city}
+                    </em>. Help us find it's exact address!
                 </span>
             </div>
         {/if}

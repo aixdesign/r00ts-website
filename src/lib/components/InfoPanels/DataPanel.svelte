@@ -238,4 +238,13 @@
         flex-direction: column;
         white-space-collapse: preserve-spaces;
     }
+
+    @media (width < 720px) {
+        .container {
+            top: 100%;
+            width: 100%;
+            margin: 0.8em;
+            left: 0em;
+        }
+    }
 </style>

@@ -151,7 +151,7 @@
     }
 
     .hidden {
-        width: 0px;
+        width: 0px !important;
     }
 
     button {
@@ -182,5 +182,16 @@
 
     hr {
         margin: 1em 0em;
+    }
+
+    @media (width < 720px) {
+        .container {
+            right: 0em;
+            width: 100%;
+        }
+
+        .panel {
+            width: 100%;
+        }
     }
 </style>
