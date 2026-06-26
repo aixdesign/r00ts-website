@@ -272,6 +272,10 @@ export class MapRaseriser {
     private rows: number = 1;
     private cols: number = 1;
 
+    private pixels: Uint32Array | null = null;
+    private prevPixels: Uint32Array | null = null;
+    private imageData: ImageData | null = null;
+
     public rasterPalette: RasteriserPalette;
 
     constructor(
@@ -284,6 +288,9 @@ export class MapRaseriser {
         this.mapCanvas = mapCanvas;
         this.glyphSize = glyphSize;
         this.glyphOverlayCanvas = glyphOverlayCanvas;
+
+
+        this.pixels = new Uint32Array(this.cols * this.rows);
 
         if (offscreenCanvas === undefined)
             this.offscreenCanvas = new OffscreenCanvas(1, 1);
@@ -331,18 +338,36 @@ export class MapRaseriser {
         this.offscreenCanvas.width = this.cols;
         this.offscreenCanvas.height = this.rows;
 
+        this.imageData = null;
+        this.prevPixels = null;
+        this.pixels = null;
+
+        this.glyphOverlayCtx?.clearRect(0, 0, this.glyphOverlayCanvas.width, this.glyphOverlayCanvas.height);
         this.renderGlyphs();
     }
 
     renderGlyphs() {
         if (this.offscreenCtx == null || this.glyphOverlayCtx == null) return;
 
-        this.glyphOverlayCtx.clearRect(0, 0, this.glyphOverlayCanvas.width, this.glyphOverlayCanvas.height);
         this.offscreenCtx.drawImage(this.mapCanvas, 0, 0, this.cols, this.rows);
-        const { data } = this.offscreenCtx.getImageData(0, 0, this.cols, this.rows);
-        const pixels = new Uint32Array(data.buffer);
-        for (let i = 0, len = pixels.length; i < len; i++) {
-            const px = pixels[i]; // one read instead of three
+
+        if (!this.imageData) {
+            this.imageData = this.offscreenCtx.getImageData(0, 0, this.cols, this.rows);
+            this.pixels = new Uint32Array(this.imageData.data.buffer)
+        } else {
+            const fresh = this.offscreenCtx.getImageData(0, 0, this.cols, this.rows);
+            this.imageData.data.set(fresh.data);
+        }
+
+        if (!this.pixels)
+            return;
+
+        for (let i = 0, len = this.pixels.length; i < len; i++) {
+            const px = this.pixels[i];
+
+            // avoid drawing un-changed pixels
+            if (this.prevPixels && this.prevPixels[i] === px) continue;
+
             const r = px & 0xFF;
             const g = (px >> 8) & 0xFF;
             const b = (px >> 16) & 0xFF;
@@ -353,6 +378,8 @@ export class MapRaseriser {
 
             if (glyph) this.glyphOverlayCtx.drawImage(glyph, row * this.glyphSize, col * this.glyphSize);
         }
+
+        this.prevPixels = new Uint32Array(this.pixels);
     }
 
     setGlyphSize(newSize: number) {
