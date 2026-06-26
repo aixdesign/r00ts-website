@@ -286,6 +286,7 @@
                     This uses your browser's location services, which requires
                     your permission, and might not be accurate on desktop.
                 </p>
+                <p>Click on the marker on the map to remove it.</p>
             </Tooltip>
             {#if "geolocation" in navigator}
                 <Button
@@ -293,9 +294,8 @@
                     onclick={() => {
                         if (!map) return;
                         const showingLocation = getUserLocation(map);
-                        if (showingLocation)
-                            stickerState.avaliable.delete("bug");
-                        else stickerState.avaliable.add("bug");
+                        if (showingLocation) stickerState.placed = true;
+                        else stickerState.placed = false;
                     }}
                 >
                     <StickerPalette />

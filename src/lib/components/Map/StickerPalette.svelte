@@ -1,7 +1,9 @@
 <script lang="ts">
     import { stickerMap, stickerState } from "./sticker.svelte";
 
-    function ondragstart(e: DragEventInit, name: string) {
+    function ondragstart(e: DragEventInit, name: string | null) {
+        if (name == null) return;
+
         if (e.dataTransfer) {
             e.dataTransfer.clearData();
             e.dataTransfer.setData("text/plain", name);
@@ -12,18 +14,14 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 
-<div class="palette" class:hidden={stickerState.avaliable.size == 0}>
-    {#each stickerState.avaliable as stickerName}
-        {#if stickerMap[stickerName]}
-            <div
-                class="sticker"
-                ondragstart={(e) => ondragstart(e, stickerName)}
-                draggable="true"
-            >
-                {stickerMap[stickerName]}
-            </div>
-        {/if}
-    {/each}
+<div class="palette" class:hidden={stickerState.placed}>
+    <div
+        class="sticker"
+        ondragstart={(e) => ondragstart(e, stickerState.avaliable)}
+        draggable="true"
+    >
+        {stickerMap[stickerState.avaliable]}
+    </div>
 </div>
 
 <style>

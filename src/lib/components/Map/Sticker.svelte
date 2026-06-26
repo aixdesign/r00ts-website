@@ -13,6 +13,24 @@
 
 <style>
     .emoji {
-        font-size: 24pt;
+        --border-colour: #fff;
+        font-size: 28pt;
+        text-shadow:
+            -4px -4px 0 var(--border-colour),
+            -4px 4px 0 var(--border-colour),
+            4px -4px 0 var(--border-colour),
+            4px 4px 0 var(--border-colour),
+            0px 4px 0 var(--border-colour),
+            0px -4px 0 var(--border-colour),
+            4px 0px 0 var(--border-colour),
+            -4px 0px 0 var(--border-colour),
+            2px 4px 0 var(--border-colour),
+            2px -4px 0 var(--border-colour),
+            4px 2px 0 var(--border-colour),
+            -4px 2px 0 var(--border-colour),
+            -2px 4px 0 var(--border-colour),
+            -2px -4px 0 var(--border-colour),
+            4px -2px 0 var(--border-colour),
+            -4px -2px 0 var(--border-colour);
     }
 </style>

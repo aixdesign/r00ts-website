@@ -71,7 +71,7 @@
             <em>r00ts.xyz</em> does not record your browsing history nor collect
             <b>any</b> information about your browsing habits or your access to the
             site. We do not use any cookies or tracking technologies. If you use
-            the "Locate" feature, this information stays within your broswer and
+            the "Locate" feature, this information stays within your browser and
             we do not see it.
         </p>
 

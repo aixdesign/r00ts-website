@@ -16,7 +16,7 @@ function success(map: maplibregl.Map, position: GeolocationPosition) {
             const sticker = addSticker(map, [
                 position.coords.longitude,
                 position.coords.latitude,
-            ], "bug");
+            ], stickerState.avaliable);
 
             locationMarker = sticker.marker;
             component = sticker.component;
