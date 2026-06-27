@@ -292,6 +292,7 @@
                 </p>
                 <p>Click on the marker on the map to remove it.</p>
             </Tooltip>
+            <StickerPalette />
             {#if "geolocation" in navigator}
                 <Button
                     highlight={showLocation.value}
@@ -302,7 +303,6 @@
                         else stickerState.placed = false;
                     }}
                 >
-                    <StickerPalette />
                     Locate
                 </Button>
             {/if}

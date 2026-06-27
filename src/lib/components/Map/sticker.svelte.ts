@@ -7,8 +7,11 @@ export const stickerMap: Record<string, string> = {
     "bug": "🐛",
     "home": "🏠",
     "butterfly": "🦋",
-    "robot": "🤖",
-    "ladybug": "🐞"
+    "ladybug": "🐞",
+    "fox": "🦊",
+    "bee": "🐝",
+    "frog": "🐸",
+    "seed": "🌱",
 };
 
 const random = Object.keys(stickerMap)[Math.floor(Math.random() * Object.keys(stickerMap).length)];

@@ -38,5 +38,25 @@
         text-align: center;
         cursor: grab;
         user-select: none;
+        font-size: 18pt;
+        margin: 0.5em;
+        --border-colour: #fff;
+        text-shadow:
+            -4px -4px 0 var(--border-colour),
+            -4px 4px 0 var(--border-colour),
+            4px -4px 0 var(--border-colour),
+            4px 4px 0 var(--border-colour),
+            0px 4px 0 var(--border-colour),
+            0px -4px 0 var(--border-colour),
+            4px 0px 0 var(--border-colour),
+            -4px 0px 0 var(--border-colour),
+            2px 4px 0 var(--border-colour),
+            2px -4px 0 var(--border-colour),
+            4px 2px 0 var(--border-colour),
+            -4px 2px 0 var(--border-colour),
+            -2px 4px 0 var(--border-colour),
+            -2px -4px 0 var(--border-colour),
+            4px -2px 0 var(--border-colour),
+            -4px -2px 0 var(--border-colour);
     }
 </style>
