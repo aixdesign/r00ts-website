@@ -275,7 +275,12 @@
     >
     </canvas>
     {#if showDebug && rasteriser}
-        <DebugPanel {rasteriser} {mapBuildingsStyle} {setBuildingStyle} />
+        <DebugPanel
+            {rasteriser}
+            {mapBuildingsStyle}
+            {setBuildingStyle}
+            {zoomState}
+        />
     {/if}
 
     <div class="controls">

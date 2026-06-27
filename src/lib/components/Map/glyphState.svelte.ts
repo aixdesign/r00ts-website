@@ -1,6 +1,6 @@
 import type { GlyphParams } from './types.ts';
 
-export const glyphSize = $state({ value: 8 });
+export const glyphSize = $state({ value: 6 });
 
 export const glyphState: GlyphParams[] = $state.raw([
     {

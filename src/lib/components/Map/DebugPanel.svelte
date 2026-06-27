@@ -10,9 +10,11 @@
         setBuildingStyle: (
             style: maplibregl.StyleSpecification | string,
         ) => void;
+        zoomState: { value: number };
     }
 
-    let { rasteriser, mapBuildingsStyle, setBuildingStyle }: Props = $props();
+    let { rasteriser, mapBuildingsStyle, setBuildingStyle, zoomState }: Props =
+        $props();
 
     let debugShow = $state(false);
 
@@ -109,20 +111,23 @@
             </tbody>
         </table>
     </div>
-    <label>
-        <input
-            type="range"
-            id="glyph-size"
-            min="4"
-            max="32"
-            step="1"
-            bind:value={glyphSize.value}
-            oninput={() => {
-                rasteriser?.setGlyphSize(glyphSize.value);
-            }}
-        />
-        <span id="glyph-size-l">{glyphSize.value}</span>
-    </label>
+    <div class="horizontal">
+        <label>
+            <input
+                type="range"
+                id="glyph-size"
+                min="4"
+                max="32"
+                step="1"
+                bind:value={glyphSize.value}
+                oninput={() => {
+                    rasteriser?.setGlyphSize(glyphSize.value);
+                }}
+            />
+            <span id="glyph-size-l">{glyphSize.value}</span>
+        </label>
+        <span> Current Zoom: {zoomState.value.toFixed(2)}</span>
+    </div>
 </div>
 
 <style>
