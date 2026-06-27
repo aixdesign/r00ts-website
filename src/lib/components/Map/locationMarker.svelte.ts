@@ -3,32 +3,27 @@ import { unmount } from "svelte";
 import { addSticker, stickerState } from "./sticker.svelte";
 
 let watchId: number;
-let locationMarker: maplibregl.Marker | null = null;
 let component: { $set?: any, $get?: any };
 
 export let showLocation = $state({ value: false });
 
-let follow = true;
+let follow = false;
 
 function success(map: maplibregl.Map, position: GeolocationPosition) {
-    if (!locationMarker) {
-        if (!stickerState.locationMarker) {
-            const sticker = addSticker(map, [
-                position.coords.longitude,
-                position.coords.latitude,
-            ], stickerState.avaliable);
+    stickerState.loading = false;
+    if (!stickerState.locationMarker) {
+        const sticker = addSticker(map, [
+            position.coords.longitude,
+            position.coords.latitude,
+        ], stickerState.avaliable);
 
-            locationMarker = sticker.marker;
-            component = sticker.component;
-        } else {
-            locationMarker = stickerState.locationMarker;
-        }
-
-        locationMarker.once('dragstart', () => {
+        stickerState.locationMarker = sticker.marker;
+        component = sticker.component;
+        stickerState.locationMarker.once('dragstart', () => {
             stopUpdatingLocation();
         });
 
-        follow = true;
+        follow = false;
 
         map.once('dragstart', () => {
             follow = false;
@@ -37,26 +32,23 @@ function success(map: maplibregl.Map, position: GeolocationPosition) {
         map.once('zoomstart', () => {
             follow = false;
         });
-
-        map.flyTo({
-            center: locationMarker.getLngLat(),
-        });
     } else {
         // update location marker
-        locationMarker.setLngLat([
+        stickerState.locationMarker.setLngLat([
             position.coords.longitude,
             position.coords.latitude,
         ]);
 
         if (follow)
             map.jumpTo({
-                center: locationMarker.getLngLat(),
+                center: stickerState.locationMarker.getLngLat(),
             });
     }
 }
 
 function error(error: GeolocationPositionError) {
     showLocation.value = false;
+    stickerState.loading = false;
     console.log(
         `Geolocation Error: ${error.code}: ${error.message}`,
     );
@@ -70,9 +62,10 @@ export function getUserLocation(map: maplibregl.Map) {
             error,
             { enableHighAccuracy: true },
         );
+        stickerState.loading = true;
     } else {
-        locationMarker?.remove();
-        locationMarker = null;
+        stickerState.locationMarker?.remove();
+        stickerState.locationMarker = null;
 
         stickerState.locationMarker = null;
         stopUpdatingLocation();

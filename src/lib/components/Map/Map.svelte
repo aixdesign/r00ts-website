@@ -310,6 +310,9 @@
                     }}
                 >
                     Locate
+                    {#if stickerState.loading}
+                        <span class="loader"></span>
+                    {/if}
                 </Button>
             {/if}
         </div>
@@ -357,5 +360,25 @@
     .horizontal {
         display: flex;
         align-items: center;
+    }
+
+    .loader {
+        width: 1em;
+        height: 1em;
+        border: 3px solid #000;
+        border-bottom-color: transparent;
+        border-radius: 50%;
+        display: inline-block;
+        box-sizing: border-box;
+        animation: rotation 1.4s linear infinite;
+    }
+
+    @keyframes rotation {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
     }
 </style>

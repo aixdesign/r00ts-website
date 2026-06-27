@@ -335,7 +335,6 @@ export class MapRaseriser {
         this.dpr = window.devicePixelRatio || 1;
         this.rasterPalette.dpr = this.dpr;
 
-        console.log(`resize ${width} ${height} ${this.dpr}`);
         if (width != undefined) {
             this.glyphOverlayCanvas.width = width;
             this.glyphOverlayCanvas.style.width = (width / this.dpr) + "px";
