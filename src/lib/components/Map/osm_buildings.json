@@ -19,7 +19,7 @@
             "source": "openmaptiles",
             "source-layer": "building",
             "paint": {
-                "fill-color": "#8ff0a4"
+                "fill-color": "#ff3f99"
             }
         },
         {
@@ -41,7 +41,7 @@
                 "visibility": "visible"
             },
             "paint": {
-                "fill-color": "#8ff0a4"
+                "fill-color": "#ff3f99"
             }
         },
         {
