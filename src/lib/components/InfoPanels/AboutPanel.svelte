@@ -9,6 +9,10 @@
 
     let { show }: Props = $props();
 
+    $effect(() => {
+        if (markerState.datacenter && show) show = false;
+    });
+
     function toggle() {
         show = !show;
         markerState.datacenter = null;
