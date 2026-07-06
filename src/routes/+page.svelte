@@ -9,6 +9,7 @@
     import AboutPanel from "$lib/components/InfoPanels/AboutPanel.svelte";
     import SessionPanel from "$lib/components/InfoPanels/SessionPanel.svelte";
     import type { Datacenter } from "$lib/types.js";
+    import SearchBar from "$lib/components/SearchBar.svelte";
 
     const { data } = $props();
 
@@ -17,6 +18,8 @@
         dataState.networksDatacenters = data.networksDatacenters;
         dataState.entries = data.entries;
         dataState.networkIps = data.networkIps;
+        if (data.pageUrl) dataState.pageUrl = data.pageUrl;
+        else dataState.pageUrl = "";
 
         firstVisit = !sessionStorage.getItem("hasVisited");
         sessionStorage.setItem("hasVisited", "true");
@@ -28,6 +31,7 @@
     let inSession: boolean = $derived(
         Object.keys(dataState.entries).length > 0 ? true : false,
     );
+    $inspect(inSession);
 </script>
 
 <div class="contents">
@@ -42,9 +46,9 @@
             <SummaryPanel
                 entries={data.entries}
                 datacenters={data.datacenters}
-                pageUrl={data.pageUrl}
             />
         {:else}
+            <SearchBar></SearchBar>
             <a href="https://github.com/al165/r00ts-extension/releases/latest">
                 <button id="r00ts-download-btn">
                     Download the extension (Firefox and Chrome!)

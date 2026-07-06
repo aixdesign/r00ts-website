@@ -1,32 +1,59 @@
 <script lang="ts">
-    import type { Datacenter, Entry } from "$lib/types";
+    import { resolve } from "$app/paths";
+    import type { Datacenter } from "$lib/types";
+    import Button from "../Button.svelte";
+    import { dataState } from "./data.svelte";
     import Tooltip from "./Tooltip.svelte";
 
     interface Props {
-        entries: { [key: string]: Entry };
         datacenters: Datacenter[];
-        pageUrl?: string;
     }
 
-    let { entries, datacenters, pageUrl }: Props = $props();
+    let { datacenters }: Props = $props();
 
-    let num_ips = $derived(Object.keys(entries).length);
+    let num_ips = $derived(Object.keys(dataState.entries).length);
     let num_datacenters = $derived(datacenters.length);
     let cities = $derived.by(() => {
-        const names = Array.from(new Set(datacenters.map((dc) => dc.city)));
+        let names = Array.from(new Set(datacenters.map((dc) => dc.city)));
 
         if (names.length == 1) return names[0];
+
+        if (names.length > 6) {
+            const more = names.length - 5;
+            names = names.slice(0, 5);
+            names.push(`${more} more`);
+        }
 
         let list = names.slice(0, -1).join(", ");
         list = `${list} and ${names.at(-1)}`;
 
         return list;
     });
+
+    const submitSessionAPI = resolve("/api/session");
+    console.log(`submitSessionAPI: ${submitSessionAPI}`);
+    function submitSession() {
+        fetch(submitSessionAPI, {
+            method: "POST",
+            body: JSON.stringify({
+                hostname: dataState.pageUrl,
+                entries: dataState.entries,
+            }),
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                console.log(data);
+            })
+            .catch((err) => {
+                console.error(err);
+            });
+    }
 </script>
 
 <div class="container">
     <span>
-        your session on<br /> <em>{pageUrl ?? "the website"}</em> was served by:
+        your session on<br /> <em>{dataState.pageUrl ?? "the website"}</em> was served
+        by:
     </span>
     <ul>
         {#if num_ips > 0}
@@ -80,6 +107,7 @@
             </li>
         {/if}
     </ul>
+    <Button onclick={submitSession}>Submit results</Button>
 </div>
 
 <style>

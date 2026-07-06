@@ -1,9 +1,10 @@
 import path from 'path';
 
-import Database from 'better-sqlite3';
 import { migrate } from '@blackglory/better-sqlite3-migrations';
+import Database from 'better-sqlite3';
 
-import { type Note, type Datacenter, type Network, NoteType, type PostResult, type IpBlock, type Facility, type City } from '$lib/types';
+import type { City, Datacenter, Entry, EntryRow, Facility, IpBlock, Network, Note, PostResult, Session } from '$lib/types';
+import { NoteType } from '$lib/types';
 
 import { NETWORKSDB_API } from '$env/static/private';
 import { CONTINENT_COUNTRY_LIST } from './countries';
@@ -18,10 +19,10 @@ else
 const db = new Database('r00ts.db');
 db.pragma('journal_mode = WAL');
 
-import { findMigrationFilenames, readMigrationFile } from 'migration-files'
 import { intToIP, IPtoInt } from '$lib/ip_utils';
-import { getFacilitiesFromASN, getPeeringDBNetwork } from './peeringdb';
+import { findMigrationFilenames, readMigrationFile } from 'migration-files';
 import { fetchSatilliteView } from './mapbox_fetch';
+import { getFacilitiesFromASN, getPeeringDBNetwork } from './peeringdb';
 
 const filenames = await findMigrationFilenames(path.join(process.cwd(), 'src/lib/server/migrations'));
 const migrations = await Promise.all(filenames.map(readMigrationFile));
@@ -29,7 +30,7 @@ const migrations = await Promise.all(filenames.map(readMigrationFile));
 migrate(db, migrations);
 
 // Convenience methods to interact with the database
-function tableInsert(table: string, parameters: any, on_conflict?: string) {
+function tableInsert(table: string, parameters: Record<string, any>, on_conflict?: string) {
     const keys = Object.keys(parameters);
     const values = Object.values(parameters);
     const placeholder = keys.map(_ => "?").join(',');
@@ -37,6 +38,26 @@ function tableInsert(table: string, parameters: any, on_conflict?: string) {
     const statement = `INSERT INTO ${table}(${keys.join(',')}) VALUES(${placeholder}) ${conflict_clause}`;
     return db.prepare(statement).run(values);
 }
+
+export function getHostname(url: string) {
+    try {
+        // Need protocol for URL object to work
+        if (!url.startsWith('http'))
+            url = `http://${url}`;
+        const urlObject = new URL(url);
+        let hostname = urlObject.hostname;
+        hostname = hostname.replace(/^www./, '');
+        return hostname;
+    } catch {
+        // Manual cleanup
+        url = url.trim();
+        url = url.replace(/^https?:\/\//, '');
+        url = url.replace(/^www./, '');
+        url = url.split('/')[0];
+        return url;
+    }
+}
+
 
 export function getAllNotes() {
     const notes = db.prepare("SELECT * FROM Notes").all() as Note[];
@@ -490,4 +511,58 @@ export function updateDatacenterFilename(id: number, filename: string) {
         console.error(`Error updating datacenter ${id}`);
         console.error(err);
     }
+}
+
+export function insertSession(hostname: string, entries: Record<string, Entry>) {
+    if (!hostname)
+        return false;
+
+    const submitted = Math.floor(Date.now() / 1000);
+
+    tableInsert('Sessions', { hostname, submitted }, "DO NOTHING");
+    const session = db.prepare("SELECT * FROM Sessions WHERE hostname = ?").get(hostname) as Session;
+    if (!session)
+        return false;
+
+    const session_id = session.id;
+    for (const entry of Object.values(entries)) {
+        tableInsert(
+            'Entries',
+            { hostname: entry.hostname, ip: entry.ip, network_id: entry.network_id, submitted },
+            "DO NOTHING"
+        );
+        const entry_row = db.prepare("SELECT * FROM Entries WHERE hostname = ? AND ip = ?").get(entry.hostname, entry.ip) as EntryRow;
+        const entry_id = entry_row.id as number;
+
+        tableInsert('SessionEntries', { session_id, entry_id }, "DO NOTHING");
+    }
+
+    return true;
+}
+
+export function getSession(hostname: string) {
+    if (!hostname)
+        return [];
+
+    const select_clause = `
+        SELECT e.id, e.hostname, e.ip, e.network_id FROM Entries e
+        JOIN SessionEntries ON e.id = SessionEntries.entry_id
+        JOIN Sessions ON Sessions.id = SessionEntries.session_id
+        WHERE Sessions.hostname = ?
+    `;
+    const entries = db.prepare(select_clause).all(hostname) as EntryRow[];
+
+    return entries;
+}
+
+export function searchSessions(hostname: string) {
+    if (!hostname)
+        return [];
+
+    const select_clause = `SELECT hostname FROM Sessions WHERE hostname LIKE ? ORDER BY submitted DESC LIMIT 10`;
+    const result = db.prepare(select_clause).all(`%${hostname}%`) as { hostname: string }[];
+
+    const suggestions = result.map(e => e.hostname);
+
+    return suggestions;
 }
