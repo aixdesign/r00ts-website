@@ -39,26 +39,6 @@ function tableInsert(table: string, parameters: Record<string, any>, on_conflict
     return db.prepare(statement).run(values);
 }
 
-export function getHostname(url: string) {
-    try {
-        // Need protocol for URL object to work
-        if (!url.startsWith('http'))
-            url = `http://${url}`;
-        const urlObject = new URL(url);
-        let hostname = urlObject.hostname;
-        hostname = hostname.replace(/^www./, '');
-        return hostname;
-    } catch {
-        // Manual cleanup
-        url = url.trim();
-        url = url.replace(/^https?:\/\//, '');
-        url = url.replace(/^www./, '');
-        url = url.split('/')[0];
-        return url;
-    }
-}
-
-
 export function getAllNotes() {
     const notes = db.prepare("SELECT * FROM Notes").all() as Note[];
     return { notes };

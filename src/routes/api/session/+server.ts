@@ -4,13 +4,14 @@ import { json, error } from '@sveltejs/kit';
 import * as database from '$lib/server/database.js';
 import { isIPv4 } from '$lib/ip_utils.js';
 import type { Entry } from '$lib/types.js';
+import { getHostname, getNetworkIps } from '$lib/server/utils';
 
 export async function GET({ url }) {
     const query = url.searchParams.get('query');
     const autocomplete = url.searchParams.get('autocomplete');
 
     if (autocomplete) {
-        const hostname = database.getHostname(autocomplete);
+        const hostname = getHostname(autocomplete);
         const suggestions = database.searchSessions(hostname);
 
         return json({ suggestions });
@@ -35,7 +36,7 @@ export async function GET({ url }) {
 
         return json({ pageUrl: query, datacenters, networks: [result.network] });
     } else {
-        const hostname = database.getHostname(query);
+        const hostname = getHostname(query);
         if (!hostname)
             return error(400, 'Invalid hostname');
 
@@ -54,15 +55,16 @@ export async function GET({ url }) {
         });
 
         const networks = database.getNetworksFromIds(Array.from(network_ids));
+        const networkIps = getNetworkIps(entries);
 
-        return json({ pageUrl: hostname, entries, networks, datacenters });
+        return json({ pageUrl: hostname, entries, networks, datacenters, networkIps });
     }
 };
 
 export async function POST({ request }) {
     let { hostname, entries, datacenter_ids } = await request.json();
 
-    hostname = database.getHostname(hostname);
+    hostname = getHostname(hostname);
     if (!hostname || !entries || !datacenter_ids)
         return error(400, 'Host, datacenter_ids or entry list not submitted');
 
