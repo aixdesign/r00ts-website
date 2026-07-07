@@ -5,8 +5,6 @@
 
     import { dataState } from "./data.svelte";
 
-    let { hostname }: { hostname?: string } = $props();
-
     function onclick() {
         dataState.entries = {};
         dataState.networks = {};
@@ -19,8 +17,8 @@
 </script>
 
 <div class="container">
-    {#if hostname}
-        <div class="url">{hostname}</div>
+    {#if dataState.pageUrl}
+        <div class="url">{dataState.pageUrl}</div>
     {/if}
     <button {onclick}>Exit session</button>
 </div>

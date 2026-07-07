@@ -25,6 +25,14 @@ CREATE TABLE SessionEntries (
     PRIMARY KEY (session_id, entry_id)
 );
 
+CREATE TABLE SessionsDatacenters (
+    session_id INTEGER,
+    datacenter_id INTEGER,
+    FOREIGN KEY(session_id) REFERENCES Sessions(id),
+    FOREIGN KEY(datacenter_id) REFERENCES Datacenters(id),
+    PRIMARY KEY (session_id, datacenter_id)
+);
+
 --
 -- Down
 --
@@ -32,3 +40,4 @@ CREATE TABLE SessionEntries (
 DROP TABLE Entries;
 DROP TABLE Sessions;
 DROP TABLE SessionEntries;
+DROP TABLE SessionsDatacenters;

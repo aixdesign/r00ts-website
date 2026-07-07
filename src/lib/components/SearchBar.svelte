@@ -18,16 +18,17 @@
         fetch(`${sessionUrl}?${params.toString()}`)
             .then((res) => res.json())
             .then((data) => {
-                console.log(data);
                 if (!data.entries) {
                     message =
                         "Could not find user submitted results for this query!";
                     return;
                 }
 
+                dataState.isSearchResults = true;
                 dataState.entries = data.entries;
                 dataState.networks = data.networks;
                 dataState.pageUrl = data.pageUrl;
+                dataState.datacenters = data.datacenters;
             })
             .catch(() => {
                 message =
@@ -36,10 +37,10 @@
     }
 
     function oninput() {
-        //console.log(`oninput ${query}`);
         if (autocompleteTimeout) clearTimeout(autocompleteTimeout);
 
-        if (!query.length) {
+        if (query.length < 2) {
+            message = "";
             autocompleteEntries = [];
             return;
         }
@@ -60,6 +61,17 @@
         }, 500);
     }
 
+    function onkeyup(ev: KeyboardEvent) {
+        if (ev.key == "Enter") {
+            onsubmit();
+        } else if (ev.key == "Escape") {
+            query = "";
+            autocompleteEntries = [];
+            if (autocompleteTimeout) clearTimeout(autocompleteTimeout);
+            message = "";
+        }
+    }
+
     function completeAutofill(value: string) {
         query = value;
         autocompleteEntries = [];
@@ -71,9 +83,7 @@
     <input
         bind:value={query}
         placeholder="Search user submitted URLs, or any IP address"
-        onkeyup={(ev) => {
-            if (ev.key == "Enter") onsubmit();
-        }}
+        {onkeyup}
         {oninput}
     />
     {#if message}

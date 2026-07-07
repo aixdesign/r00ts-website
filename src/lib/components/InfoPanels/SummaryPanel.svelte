@@ -1,20 +1,15 @@
 <script lang="ts">
     import { resolve } from "$app/paths";
-    import type { Datacenter } from "$lib/types";
     import Button from "../Button.svelte";
     import { dataState } from "./data.svelte";
     import Tooltip from "./Tooltip.svelte";
 
-    interface Props {
-        datacenters: Datacenter[];
-    }
-
-    let { datacenters }: Props = $props();
-
     let num_ips = $derived(Object.keys(dataState.entries).length);
-    let num_datacenters = $derived(datacenters.length);
+    let num_datacenters = $derived(dataState.datacenters.length);
     let cities = $derived.by(() => {
-        let names = Array.from(new Set(datacenters.map((dc) => dc.city)));
+        let names = Array.from(
+            new Set(dataState.datacenters.map((dc) => dc.city)),
+        );
 
         if (names.length == 1) return names[0];
 
@@ -31,13 +26,13 @@
     });
 
     const submitSessionAPI = resolve("/api/session");
-    console.log(`submitSessionAPI: ${submitSessionAPI}`);
     function submitSession() {
         fetch(submitSessionAPI, {
             method: "POST",
             body: JSON.stringify({
                 hostname: dataState.pageUrl,
                 entries: dataState.entries,
+                datacenter_ids: dataState.datacenters.map((e) => e.id),
             }),
         })
             .then((res) => res.json())
@@ -52,8 +47,18 @@
 
 <div class="container">
     <span>
-        your session on<br /> <em>{dataState.pageUrl ?? "the website"}</em> was served
-        by:
+        {#if dataState.isSearchResults}
+            users so far have found that
+        {:else}
+            your session on
+        {/if}
+        <br /> <em>{dataState.pageUrl ?? "the website"}</em>
+        {#if dataState.isSearchResults}
+            is
+        {:else}
+            was
+        {/if}
+        served by:
     </span>
     <ul>
         {#if num_ips > 0}
@@ -107,7 +112,9 @@
             </li>
         {/if}
     </ul>
-    <Button onclick={submitSession}>Submit results</Button>
+    {#if !dataState.isSearchResults}
+        <Button onclick={submitSession}>Submit results</Button>
+    {/if}
 </div>
 
 <style>

@@ -76,7 +76,7 @@
     }
 
     function fitAll(animate: boolean = false) {
-        if (!datacenters) return;
+        if (!datacenters || !datacenters.length) return;
 
         const bounds = datacenters.reduce((bounds, dc) => {
             return bounds.extend([dc.lon, dc.lat]);
@@ -246,7 +246,7 @@
             datacenterMarkers.delete(id);
         }
 
-        if (datacenters)
+        if (datacenters && datacenters.length)
             for (const dc of datacenters) {
                 const { marker, component } = addMarker(map, {
                     datacenter: dc,

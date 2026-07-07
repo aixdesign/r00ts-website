@@ -513,7 +513,7 @@ export function updateDatacenterFilename(id: number, filename: string) {
     }
 }
 
-export function insertSession(hostname: string, entries: Record<string, Entry>) {
+export function insertSession(hostname: string, entries: Record<string, Entry>, datacenter_ids: number[]) {
     if (!hostname)
         return false;
 
@@ -537,22 +537,33 @@ export function insertSession(hostname: string, entries: Record<string, Entry>) 
         tableInsert('SessionEntries', { session_id, entry_id }, "DO NOTHING");
     }
 
+    for (const datacenter_id of datacenter_ids)
+        tableInsert('SessionsDatacenters', { session_id, datacenter_id }, "DO NOTHING");
+
     return true;
 }
 
 export function getSession(hostname: string) {
     if (!hostname)
-        return [];
+        return { entry_rows: [], datacenters: [] };
 
-    const select_clause = `
+    const session_row = db.prepare("SELECT * FROM Sessions WHERE Sessions.hostname = ?").get(hostname) as Session | null;
+    if (!session_row)
+        return { entry_rows: [], datacenters: [] };
+
+    const session_select = `
         SELECT e.id, e.hostname, e.ip, e.network_id FROM Entries e
         JOIN SessionEntries ON e.id = SessionEntries.entry_id
-        JOIN Sessions ON Sessions.id = SessionEntries.session_id
-        WHERE Sessions.hostname = ?
+        WHERE SessionEntries.session_id = ?
     `;
-    const entries = db.prepare(select_clause).all(hostname) as EntryRow[];
+    const entry_rows = db.prepare(session_select).all(session_row.id) as EntryRow[];
 
-    return entries;
+    const datacenter_rows = db.prepare("SELECT datacenter_id FROM SessionsDatacenters WHERE session_id = ?").all(session_row.id) as { datacenter_id: number }[];
+    const datacenter_ids = datacenter_rows.map(e => e.datacenter_id);
+
+    const datacenters = getDatacentersFromIds(datacenter_ids);
+
+    return { entry_rows, datacenters };
 }
 
 export function searchSessions(hostname: string) {

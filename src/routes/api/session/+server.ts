@@ -41,14 +41,14 @@ export async function GET({ url }) {
         if (!hostname)
             return error(400, 'Invalid hostname');
 
-        const result = database.getSession(hostname);
-        if (!result.length)
+        const { entry_rows, datacenters } = database.getSession(hostname);
+        if (!entry_rows.length || !datacenters.length)
             return error(400, 'No session in database');
 
         const entries: Record<string, Entry> = {};
         const network_ids: Set<number> = new Set();
 
-        result.forEach(e => {
+        entry_rows.forEach(e => {
             if (e.network_id != undefined)
                 network_ids.add(e.network_id);
 
@@ -57,18 +57,17 @@ export async function GET({ url }) {
 
         const networks = database.getNetworksFromIds(Array.from(network_ids));
 
-
-        return json({ pageUrl: hostname, entries, networks });
+        return json({ pageUrl: hostname, entries, networks, datacenters });
     }
 };
 
 export async function POST({ request }) {
-    let { hostname, entries } = await request.json();
+    let { hostname, entries, datacenter_ids } = await request.json();
 
     hostname = database.getHostname(hostname);
-    if (!hostname || !entries)
-        return error(400, 'Host or entry list not submitted');
+    if (!hostname || !entries || !datacenter_ids)
+        return error(400, 'Host, datacenter_ids or entry list not submitted');
 
-    const result = database.insertSession(hostname, entries);
+    const result = database.insertSession(hostname, entries, datacenter_ids);
     return json({ success: result })
 };

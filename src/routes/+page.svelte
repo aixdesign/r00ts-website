@@ -8,45 +8,40 @@
     import { dataState } from "$lib/components/InfoPanels/data.svelte.js";
     import AboutPanel from "$lib/components/InfoPanels/AboutPanel.svelte";
     import SessionPanel from "$lib/components/InfoPanels/SessionPanel.svelte";
-    import type { Datacenter } from "$lib/types.js";
     import SearchBar from "$lib/components/SearchBar.svelte";
 
     const { data } = $props();
 
     onMount(() => {
+        dataState.isSearchResults = false;
         dataState.networks = data.networks;
         dataState.networksDatacenters = data.networksDatacenters;
         dataState.entries = data.entries;
         dataState.networkIps = data.networkIps;
         if (data.pageUrl) dataState.pageUrl = data.pageUrl;
         else dataState.pageUrl = "";
+        dataState.datacenters = data.datacenters;
 
         firstVisit = !sessionStorage.getItem("hasVisited");
         sessionStorage.setItem("hasVisited", "true");
     });
 
-    let datacenters: Datacenter[] = $derived(data.datacenters);
-
     let firstVisit = $state(false);
     let inSession: boolean = $derived(
         Object.keys(dataState.entries).length > 0 ? true : false,
     );
-    $inspect(inSession);
 </script>
 
 <div class="contents">
     <Map
-        {datacenters}
+        datacenters={dataState.datacenters}
         showDebug={data.showDebug}
         leftPadding={data.entries ? 500 : 100}
     >
         {#if inSession}
             <SessionPanel hostname={data.pageUrl} />
             <IpPanel />
-            <SummaryPanel
-                entries={data.entries}
-                datacenters={data.datacenters}
-            />
+            <SummaryPanel />
         {:else}
             <SearchBar></SearchBar>
             <a href="https://github.com/al165/r00ts-extension/releases/latest">
