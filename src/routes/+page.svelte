@@ -13,6 +13,7 @@
     const { data } = $props();
 
     onMount(() => {
+        console.log("+page.svelte onMount");
         dataState.isSearchResults = false;
         dataState.networks = data.networks;
         dataState.networksDatacenters = data.networksDatacenters;
@@ -39,7 +40,7 @@
         leftPadding={data.entries ? 500 : 100}
     >
         {#if inSession}
-            <SessionPanel hostname={data.pageUrl} />
+            <SessionPanel />
             <IpPanel />
             <SummaryPanel />
         {:else}

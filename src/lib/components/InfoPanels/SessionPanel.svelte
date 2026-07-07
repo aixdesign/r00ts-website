@@ -9,6 +9,8 @@
         dataState.entries = {};
         dataState.networks = {};
         dataState.networksDatacenters = {};
+        dataState.isSearchResults = false;
+        dataState.datacenters = [];
         markerState.datacenter = null;
         markerState.highlighted = [];
         markerState.preview = [];

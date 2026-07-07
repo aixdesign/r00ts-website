@@ -19,8 +19,6 @@ export async function GET({ url }) {
     if (!query)
         return error(400, 'No query included');
 
-    console.log('[GET] /api/session', `query: ${query}`);
-
     // Check if a URL or IP address
     if (isIPv4(query)) {
         const result = await database.getNetwork(query);

@@ -82,7 +82,7 @@
 <div class="wrapper">
     <input
         bind:value={query}
-        placeholder="Search user submitted URLs, or any IP address"
+        placeholder="Search user submitted URLs"
         {onkeyup}
         {oninput}
     />
@@ -114,11 +114,12 @@
 
     input {
         font-family: inherit;
-        padding: 0.2em;
+        font-size: inherit;
         border: none;
         width: 100%;
         box-sizing: border-box;
         text-align: center;
+        padding: 0.5em 1em;
     }
 
     .error,
