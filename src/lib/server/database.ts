@@ -1,9 +1,10 @@
 import path from 'path';
 
-import Database from 'better-sqlite3';
 import { migrate } from '@blackglory/better-sqlite3-migrations';
+import Database from 'better-sqlite3';
 
-import { type Note, type Datacenter, type Network, NoteType, type PostResult, type IpBlock, type Facility, type City } from '$lib/types';
+import type { City, Datacenter, Entry, EntryRow, Facility, IpBlock, Network, Note, PostResult, Session } from '$lib/types';
+import { NoteType } from '$lib/types';
 
 import { NETWORKSDB_API } from '$env/static/private';
 import { CONTINENT_COUNTRY_LIST } from './countries';
@@ -18,10 +19,10 @@ else
 const db = new Database('r00ts.db');
 db.pragma('journal_mode = WAL');
 
-import { findMigrationFilenames, readMigrationFile } from 'migration-files'
 import { intToIP, IPtoInt } from '$lib/ip_utils';
-import { getFacilitiesFromASN, getPeeringDBNetwork } from './peeringdb';
+import { findMigrationFilenames, readMigrationFile } from 'migration-files';
 import { fetchSatilliteView } from './mapbox_fetch';
+import { getFacilitiesFromASN, getPeeringDBNetwork } from './peeringdb';
 
 const filenames = await findMigrationFilenames(path.join(process.cwd(), 'src/lib/server/migrations'));
 const migrations = await Promise.all(filenames.map(readMigrationFile));
@@ -29,7 +30,7 @@ const migrations = await Promise.all(filenames.map(readMigrationFile));
 migrate(db, migrations);
 
 // Convenience methods to interact with the database
-function tableInsert(table: string, parameters: any, on_conflict?: string) {
+function tableInsert(table: string, parameters: Record<string, any>, on_conflict?: string) {
     const keys = Object.keys(parameters);
     const values = Object.values(parameters);
     const placeholder = keys.map(_ => "?").join(',');
@@ -460,6 +461,27 @@ export function getDatacentersFromIds(ids: number[]): Datacenter[] {
     return datacenters;
 }
 
+export function getNetworksDatacenters(network_ids: number[], datacenter_ids: number[]) {
+    const result: Record<number, number[]> = {};
+
+    const network_placeholder = network_ids.map(_ => "?").join(',');
+    const datacenter_placeholder = datacenter_ids.map(_ => "?").join(',');
+
+    const rows = db.prepare(`
+        SELECT * FROM NetworksDatacenters 
+        WHERE network_id IN ( ${network_placeholder} ) AND datacenter_id IN ( ${datacenter_placeholder} )
+    `).all(...network_ids, ...datacenter_ids) as { network_id: number, datacenter_id: number }[];
+
+    rows.forEach(el => {
+        if (result[el.network_id] != undefined)
+            result[el.network_id].push(el.datacenter_id);
+        else
+            result[el.network_id] = [el.datacenter_id];
+    });
+
+    return result;
+}
+
 export async function getDatacenterAerialImage(id: number): Promise<string | null> {
     try {
         const { lat, lon, filename } = db.prepare('SELECT lat, lon, filename FROM Datacenters WHERE id = ?').get(id) as Datacenter;
@@ -490,4 +512,69 @@ export function updateDatacenterFilename(id: number, filename: string) {
         console.error(`Error updating datacenter ${id}`);
         console.error(err);
     }
+}
+
+export function insertSession(hostname: string, entries: Record<string, Entry>, datacenter_ids: number[]) {
+    if (!hostname)
+        return false;
+
+    const submitted = Math.floor(Date.now() / 1000);
+
+    tableInsert('Sessions', { hostname, submitted }, "DO NOTHING");
+    const session = db.prepare("SELECT * FROM Sessions WHERE hostname = ?").get(hostname) as Session;
+    if (!session)
+        return false;
+
+    const session_id = session.id;
+    for (const entry of Object.values(entries)) {
+        tableInsert(
+            'Entries',
+            { hostname: entry.hostname, ip: entry.ip, network_id: entry.network_id, submitted },
+            "DO NOTHING"
+        );
+        const entry_row = db.prepare("SELECT * FROM Entries WHERE hostname = ? AND ip = ?").get(entry.hostname, entry.ip) as EntryRow;
+        const entry_id = entry_row.id as number;
+
+        tableInsert('SessionEntries', { session_id, entry_id }, "DO NOTHING");
+    }
+
+    for (const datacenter_id of datacenter_ids)
+        tableInsert('SessionsDatacenters', { session_id, datacenter_id }, "DO NOTHING");
+
+    return true;
+}
+
+export function getSession(hostname: string) {
+    if (!hostname)
+        return { entry_rows: [], datacenters: [] };
+
+    const session_row = db.prepare("SELECT * FROM Sessions WHERE Sessions.hostname = ?").get(hostname) as Session | null;
+    if (!session_row)
+        return { entry_rows: [], datacenters: [] };
+
+    const session_select = `
+        SELECT e.id, e.hostname, e.ip, e.network_id FROM Entries e
+        JOIN SessionEntries ON e.id = SessionEntries.entry_id
+        WHERE SessionEntries.session_id = ?
+    `;
+    const entry_rows = db.prepare(session_select).all(session_row.id) as EntryRow[];
+
+    const datacenter_rows = db.prepare("SELECT datacenter_id FROM SessionsDatacenters WHERE session_id = ?").all(session_row.id) as { datacenter_id: number }[];
+    const datacenter_ids = datacenter_rows.map(e => e.datacenter_id);
+
+    const datacenters = getDatacentersFromIds(datacenter_ids);
+
+    return { entry_rows, datacenters };
+}
+
+export function searchSessions(hostname: string) {
+    if (!hostname)
+        return [];
+
+    const select_clause = `SELECT hostname FROM Sessions WHERE hostname LIKE ? ORDER BY submitted DESC LIMIT 10`;
+    const result = db.prepare(select_clause).all(`%${hostname}%`) as { hostname: string }[];
+
+    const suggestions = result.map(e => e.hostname);
+
+    return suggestions;
 }

@@ -1,26 +1,6 @@
-import { ipCompareFn } from "$lib/ip_utils.js";
 import { getAllDatacenters, getDatacentersFromIds, getNetworksFromIds } from "$lib/server/database.js";
+import { getNetworkIps } from "$lib/server/utils";
 import type { Datacenter, Network, Entry } from "$lib/types";
-
-function getNetworkIps(entries: { [key: string]: Entry },) {
-
-    const result: { [key: number]: Entry[] } = {};
-
-    if (!entries) return [];
-
-    for (const [ip, entry] of Object.entries(entries)) {
-        if (!entry.network_id) continue;
-
-        if (!result[entry.network_id]) result[entry.network_id] = [];
-
-        result[entry.network_id].push(entries[ip]);
-    }
-
-    for (const net_id of Object.keys(result))
-        result[parseInt(net_id)].sort((a, b) => ipCompareFn(a.ip, b.ip));
-
-    return result;
-}
 
 export async function load({ url }) {
     const showDebug: boolean = url.searchParams.get('debug') ? true : false;
@@ -28,11 +8,11 @@ export async function load({ url }) {
 
     let datacenters: Datacenter[] = [];
     let data: any;
-    let entries: { [key: string]: Entry } = {};
+    let entries: Record<string, Entry> = {};
     let pageUrl: string | undefined;
-    let networks: { [key: number]: Network } = {};
-    let networksDatacenters: { [key: number]: number[] } = {};
-    let networkIps: { [key: number]: Entry[] } = {};
+    let networks: Record<number, Network> = {};
+    let networksDatacenters: Record<number, number[]> = {};
+    let networkIps: Record<number, Entry[]> = {};
 
     if (data64) {
         try {
@@ -50,8 +30,6 @@ export async function load({ url }) {
             pageUrl = data['pageUrl'];
 
             networkIps = getNetworkIps(entries);
-
-
         } catch (err) {
             console.error(err);
         }

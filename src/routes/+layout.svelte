@@ -72,4 +72,10 @@
         z-index: 100;
         pointer-events: none;
     }
+
+    @media (width < 720px) {
+        h1 {
+            font-size: 48pt;
+        }
+    }
 </style>

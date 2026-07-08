@@ -4,6 +4,8 @@
     import { GLYPH_FUNCTIONS, MapRaseriser } from "./glyphRenderer.ts";
     import { onMount } from "svelte";
 
+    import { markerState } from "./marker.svelte.ts";
+
     interface Props {
         rasteriser: MapRaseriser;
         mapBuildingsStyle: any;
@@ -127,6 +129,10 @@
             <span id="glyph-size-l">{glyphSize.value}</span>
         </label>
         <span> Current Zoom: {zoomState.value.toFixed(2)}</span>
+        <span>
+            MarkerState: datacenter.id={markerState.datacenter?.id} noPreview={markerState.noPreview}
+            largeMarker={markerState.largeMarker}
+        </span>
     </div>
 </div>
 

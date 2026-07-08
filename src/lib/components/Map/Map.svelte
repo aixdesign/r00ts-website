@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { unmount, onDestroy, onMount } from "svelte";
+    import { onDestroy, onMount } from "svelte";
 
     import Button from "../Button.svelte";
 
@@ -11,26 +11,33 @@
     import mapBuildingsStyle from "./osm_buildings.json";
     import mapStyle from "./osm_surface.json";
 
-    import { MapRaseriser } from "./glyphRenderer.ts";
-    import { addMarker, markerState } from "./marker.svelte.ts";
-    import DebugPanel from "./DebugPanel.svelte";
     import type { Datacenter } from "$lib/types";
+    import DebugPanel from "./DebugPanel.svelte";
+    import { MapRaseriser } from "./glyphRenderer.ts";
     import { glyphSize } from "./glyphState.svelte.ts";
+    import Marker from "./Marker.svelte";
+    import { markerState } from "./marker.svelte.ts";
 
+    import Tooltip from "../InfoPanels/Tooltip.svelte";
+    import { TooltipPositions } from "../InfoPanels/tooltip.svelte.ts";
+
+    import { addSticker, stickerState } from "./sticker.svelte.ts";
+    import StickerPalette from "./StickerPalette.svelte";
     import {
         destroyLocationMarker,
         getUserLocation,
         showLocation,
     } from "./locationMarker.svelte.ts";
-    import StickerPalette from "./StickerPalette.svelte";
-    import { addSticker, stickerState } from "./sticker.svelte.ts";
-    import Tooltip from "../InfoPanels/Tooltip.svelte";
-    import { TooltipPositions } from "../InfoPanels/tooltip.svelte.ts";
+    import {
+        CLUSTER_MAX_ZOOM,
+        addClusterSource,
+        toGeoJSON,
+    } from "./clusterMarkers.ts";
 
     let mapContainer: HTMLDivElement;
     let mapBuildingsContainer: HTMLDivElement;
     let map: maplibregl.Map | null = $state.raw(null);
-    let mapBuildingsLayer: maplibregl.Map;
+    let mapBuildingsLayer: maplibregl.Map | null = $state.raw(null);
 
     let mapCanvas: HTMLCanvasElement;
     let glyphOverlayCanvas: HTMLCanvasElement;
@@ -46,6 +53,8 @@
         showDebug?: boolean;
         children?: any;
         leftPadding: number;
+        zoomOnLoad?: boolean;
+        fitAll: (animate: boolean) => void;
     }
 
     let {
@@ -54,29 +63,24 @@
         datacenters,
         showDebug = false,
         leftPadding = 100,
+        fitAll = $bindable(),
+        zoomOnLoad = false,
         children,
     }: Props = $props();
 
-    let datacenterMarkers: Map<
-        number,
-        {
-            marker: maplibregl.Marker;
-            component: any;
-            id: number;
-        }
-    > = new Map();
-
     // svelte-ignore state_referenced_locally
     let zoomState = $state({ value: zoom });
+    let bounds: maplibregl.LngLatBounds = $state(new maplibregl.LngLatBounds());
 
     let rasteriser = $state<MapRaseriser | null>(null);
 
     function setBuildingStyle(style: maplibregl.StyleSpecification | string) {
-        mapBuildingsLayer.setStyle(style, { diff: true });
+        if (mapBuildingsLayer)
+            mapBuildingsLayer.setStyle(style, { diff: true });
     }
 
-    function fitAll(animate: boolean = false) {
-        if (!datacenters) return;
+    fitAll = (animate: boolean = false) => {
+        if (!datacenters || !datacenters.length || !map) return;
 
         const bounds = datacenters.reduce((bounds, dc) => {
             return bounds.extend([dc.lon, dc.lat]);
@@ -84,7 +88,7 @@
 
         markerState.datacenter = null;
 
-        map?.fitBounds(bounds, {
+        map.fitBounds(bounds, {
             maxZoom: 16,
             padding: {
                 left: leftPadding,
@@ -94,70 +98,56 @@
             },
             animate,
         });
-    }
+    };
 
     $effect(() => {
-        if (markerState.datacenter == null) {
-            map?.easeTo({ padding: { right: 0 }, duration: 1000 });
-        } else {
-            let right = 175;
-            if (window.innerWidth < 720) right = 0;
-
-            map?.flyTo({
-                zoom: 16,
-                center: [
-                    markerState.datacenter.lon,
-                    markerState.datacenter.lat,
-                ],
-                padding: { right },
-                duration: 1000,
-            });
-        }
+        datacenters;
+        const source = mapBuildingsLayer?.getSource("datacenters") as
+            | maplibregl.GeoJSONSource
+            | undefined;
+        if (source && datacenters) source.setData(toGeoJSON(datacenters));
     });
 
     $effect(() => {
-        if (markerState.highlighted?.length) {
-            const bounds = new maplibregl.LngLatBounds();
-            datacenterMarkers.forEach((dm) => {
-                if (markerState.highlighted.includes(dm.id))
-                    bounds.extend(dm.marker.getLngLat());
-            });
+        if (!markerState.highlighted.length || !map) return;
 
-            map?.fitBounds(bounds, {
-                maxZoom: 16,
-                padding: {
-                    left: leftPadding,
-                    right: 100,
-                    top: 100,
-                    bottom: 100,
-                },
-            });
-        }
+        const bounds = new maplibregl.LngLatBounds();
+        datacenters?.forEach((dc) => {
+            if (markerState.highlighted.includes(dc.id))
+                bounds.extend([dc.lon, dc.lat]);
+        });
+
+        map.fitBounds(bounds, {
+            maxZoom: 16,
+            padding: 100,
+        });
     });
 
     onMount(() => {
-        mapBuildingsLayer = new maplibregl.Map({
-            container: mapBuildingsContainer,
-            style: mapBuildingsStyle as maplibregl.StyleSpecification,
-            center,
-            zoom,
-            interactive: false,
-            attributionControl: false,
-        });
-
         map = new maplibregl.Map({
             container: mapContainer,
             style: mapStyle as maplibregl.StyleSpecification,
             center,
             zoom,
+            interactive: false,
             attributionControl: false,
             maxCanvasSize: [8192, 8192],
         });
 
-        syncMaps(map, mapBuildingsLayer);
+        mapBuildingsLayer = new maplibregl.Map({
+            container: mapBuildingsContainer,
+            style: mapBuildingsStyle as maplibregl.StyleSpecification,
+            center,
+            zoom,
+            interactive: true,
+            attributionControl: false,
+        });
+
+        syncMaps(mapBuildingsLayer, map);
 
         mapCanvas = map.getCanvas();
         mapCanvas.style.opacity = "0";
+        mapCanvas.style.pointerEvents = "none";
 
         offscreenCanvas = new OffscreenCanvas(1, 1);
         glyphPaletteCanvas = new OffscreenCanvas(1, 1);
@@ -171,22 +161,66 @@
             glyphSize.value,
         );
 
+        zoomState.value = map.getZoom();
+
         map.on("render", () => {
             rasteriser?.renderGlyphs();
         });
 
-        map.on("zoom", () => {
-            if (map) zoomState.value = map.getZoom();
+        mapBuildingsLayer.on("zoom", () => {
+            if (!mapBuildingsLayer) return;
+
+            let newZoom = mapBuildingsLayer.getZoom();
+
+            if (markerState.datacenter && newZoom <= 13 && zoomState.value > 13)
+                markerState.datacenter = null;
+
+            markerState.largeMarker = zoomState.value > 13;
+
+            const visible =
+                zoomState.value >= CLUSTER_MAX_ZOOM ? "none" : "visible";
+            const visible_cluster_labels =
+                zoomState.value >= CLUSTER_MAX_ZOOM || zoomState.value < 3
+                    ? "none"
+                    : "visible";
+
+            mapBuildingsLayer.setLayoutProperty(
+                "clusters",
+                "visibility",
+                visible,
+            );
+            mapBuildingsLayer.setLayoutProperty(
+                "cluster-count",
+                "visibility",
+                visible_cluster_labels,
+            );
+            mapBuildingsLayer.setLayoutProperty(
+                "unclustered-point",
+                "visibility",
+                visible,
+            );
+
+            zoomState.value = newZoom;
         });
 
-        map.on("load", () => {
-            new ResizeObserver(() =>
-                rasteriser?.resize(mapCanvas.width, mapCanvas.height),
-            ).observe(mapCanvas);
+        mapBuildingsLayer.on("load", () => {
+            if (mapBuildingsLayer) {
+                addClusterSource(mapBuildingsLayer, datacenters ?? []);
+            }
+            new ResizeObserver(() => {
+                rasteriser?.resize(mapCanvas.width, mapCanvas.height);
+                if (map) bounds = map.getBounds();
+            }).observe(mapCanvas);
+
+            if (zoomOnLoad) fitAll(true);
         });
 
-        map.on("click", () => {
+        mapBuildingsLayer.on("click", () => {
             markerState.datacenter = null;
+        });
+
+        mapBuildingsLayer.on("moveend", () => {
+            if (map) bounds = map.getBounds();
         });
 
         rasteriser?.resize(mapCanvas.width, mapCanvas.height);
@@ -225,49 +259,27 @@
     }
 
     onDestroy(() => {
+        console.log("Map onDestroy");
         destroyLocationMarker();
-        datacenterMarkers.forEach(({ marker, component }) => {
-            marker.remove();
-            unmount(component);
-        });
         map?.remove();
         mapBuildingsLayer?.remove();
     });
 
-    $effect(() => {
-        if (!map) return;
-
-        const incoming = new Set(datacenters?.map((dc) => dc.id));
-
-        for (const [id, dcm] of datacenterMarkers) {
-            if (incoming.has(id)) continue;
-            unmount(dcm.component);
-            dcm.marker.remove();
-            datacenterMarkers.delete(id);
-        }
-
-        if (datacenters)
-            for (const dc of datacenters) {
-                const { marker, component } = addMarker(map, {
-                    datacenter: dc,
-                    zoomState,
-                });
-                datacenterMarkers.set(dc.id, { marker, component, id: dc.id });
-            }
-
-        fitAll();
-    });
+    let visibleMarkers = $derived(
+        zoomState.value >= CLUSTER_MAX_ZOOM && datacenters
+            ? datacenters.filter((dc) => bounds.contains([dc.lon, dc.lat]))
+            : [],
+    );
 </script>
 
 <div class="map-container">
-    <div
-        id="buildings-map"
-        bind:this={mapBuildingsContainer}
-        class="base-map map-overlay fill"
-    ></div>
+    <div bind:this={mapContainer} class="fill passive"></div>
 
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div bind:this={mapContainer} class="fill" {ondrop} {ondragover}></div>
+    {#if mapBuildingsLayer}
+        {#each visibleMarkers as dc (dc.id)}
+            <Marker map={mapBuildingsLayer} datacenter={dc}></Marker>
+        {/each}
+    {/if}
 
     <canvas
         bind:this={glyphOverlayCanvas}
@@ -275,6 +287,16 @@
         id="glyph-render"
     >
     </canvas>
+
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div
+        id="buildings-map"
+        bind:this={mapBuildingsContainer}
+        class="base-map fill"
+        {ondrop}
+        {ondragover}
+    ></div>
+
     {#if showDebug && rasteriser}
         <DebugPanel
             {rasteriser}
@@ -333,6 +355,10 @@
         left: 0;
         width: 100%;
         height: 100%;
+    }
+
+    .map-container .passive {
+        pointer-events: none;
     }
 
     :global(.maplibregl-marker) {

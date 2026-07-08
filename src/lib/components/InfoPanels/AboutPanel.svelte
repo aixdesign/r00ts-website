@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { markerState } from "$lib/components/Map/marker.svelte";
     import Button from "../Button.svelte";
     import MapLegend from "./MapLegend.svelte";
 
@@ -7,7 +6,7 @@
         show: boolean;
     }
 
-    let { show }: Props = $props();
+    let { show = $bindable() }: Props = $props();
 
     $effect(() => {
         if (markerState.datacenter && show) show = false;
@@ -15,7 +14,6 @@
 
     function toggle() {
         show = !show;
-        markerState.datacenter = null;
     }
 </script>
 
@@ -190,12 +188,14 @@
 
     @media (width < 720px) {
         .container {
+            top: 6em;
             right: 0em;
             width: 100%;
         }
 
         .panel {
             width: 100%;
+            height: calc(100% - 4em);
         }
     }
 </style>

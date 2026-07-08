@@ -1,26 +1,33 @@
 <script lang="ts">
-    import { goto } from "$app/navigation";
     import { resolve } from "$app/paths";
     import { markerState } from "../Map/marker.svelte";
 
     import { dataState } from "./data.svelte";
 
-    let { hostname }: { hostname?: string } = $props();
-
     function onclick() {
         dataState.entries = {};
         dataState.networks = {};
         dataState.networksDatacenters = {};
+        dataState.isSearchResults = false;
+        dataState.datacenters = [];
         markerState.datacenter = null;
         markerState.highlighted = [];
         markerState.preview = [];
-        goto(resolve("/"));
+
+        fetch(resolve("/api/datacenter"))
+            .then((res) => res.json())
+            .then((data) => {
+                dataState.datacenters = data.datacenters;
+            })
+            .catch((err) => {
+                console.error(err);
+            });
     }
 </script>
 
 <div class="container">
-    {#if hostname}
-        <div class="url">{hostname}</div>
+    {#if dataState.pageUrl}
+        <div class="url">{dataState.pageUrl}</div>
     {/if}
     <button {onclick}>Exit session</button>
 </div>

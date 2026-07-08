@@ -2,13 +2,20 @@
     interface Props {
         children: any;
         onclick: (ev: MouseEvent) => void;
+        element: HTMLButtonElement | undefined;
         highlight?: boolean;
     }
 
-    let { children, onclick, highlight }: Props = $props();
+    let {
+        children,
+        onclick,
+        highlight,
+        element = $bindable(),
+        ...props
+    }: Props = $props();
 </script>
 
-<button class:highlight {onclick}>
+<button bind:this={element} class:highlight {onclick} {...props}>
     {@render children?.()}
 </button>
 

@@ -93,7 +93,6 @@ export type Weather = {
     timestamp: number
 };
 
-
 export type Clue = {
     type: number,
     name: string,
@@ -103,7 +102,6 @@ export type Clue = {
     city?: string
 }
 
-
 export type Entry = {
     ip: string,
     hostname: string,
@@ -111,4 +109,18 @@ export type Entry = {
     durationMs?: number,
     network_id?: number,
     clue?: Clue
+}
+
+export type EntryRow = {
+    id: number,
+    hostname: string,
+    ip: string,
+    network_id?: number,
+    submitted: number
+}
+
+export type Session = {
+    id: number,
+    hostname: string,
+    submitted: number
 }
