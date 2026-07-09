@@ -130,7 +130,7 @@
         </label>
         <span> Current Zoom: {zoomState.value.toFixed(2)}</span>
         <span>
-            MarkerState: datacenter.id={markerState.datacenter?.id} noPreview={markerState.noPreview}
+            MarkerState: datacenter.id={markerState.datacenter?.id}
             largeMarker={markerState.largeMarker}
         </span>
     </div>

@@ -184,21 +184,23 @@
                     ? "none"
                     : "visible";
 
-            mapBuildingsLayer.setLayoutProperty(
-                "clusters",
-                "visibility",
-                visible,
-            );
-            mapBuildingsLayer.setLayoutProperty(
-                "cluster-count",
-                "visibility",
-                visible_cluster_labels,
-            );
-            mapBuildingsLayer.setLayoutProperty(
-                "unclustered-point",
-                "visibility",
-                visible,
-            );
+            if (mapBuildingsLayer.getLayer("cluseters")) {
+                mapBuildingsLayer.setLayoutProperty(
+                    "clusters",
+                    "visibility",
+                    visible,
+                );
+                mapBuildingsLayer.setLayoutProperty(
+                    "cluster-count",
+                    "visibility",
+                    visible_cluster_labels,
+                );
+                mapBuildingsLayer.setLayoutProperty(
+                    "unclustered-point",
+                    "visibility",
+                    visible,
+                );
+            }
 
             zoomState.value = newZoom;
         });
@@ -259,7 +261,6 @@
     }
 
     onDestroy(() => {
-        console.log("Map onDestroy");
         destroyLocationMarker();
         map?.remove();
         mapBuildingsLayer?.remove();
