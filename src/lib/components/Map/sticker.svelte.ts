@@ -16,7 +16,6 @@ export const stickerMap: Record<string, string> = {
 };
 
 const random = Object.keys(stickerMap)[Math.floor(Math.random() * Object.keys(stickerMap).length)];
-console.log(`Sticker: ${random}`);
 
 export let stickerState: {
     avaliable: string,

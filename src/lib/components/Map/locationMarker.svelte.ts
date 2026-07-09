@@ -7,8 +7,6 @@ let component: { $set?: any, $get?: any };
 
 export let showLocation = $state({ value: false });
 
-let follow = false;
-
 function success(map: maplibregl.Map, position: GeolocationPosition) {
     stickerState.loading = false;
     if (!stickerState.locationMarker) {
@@ -23,26 +21,12 @@ function success(map: maplibregl.Map, position: GeolocationPosition) {
             stopUpdatingLocation();
         });
 
-        follow = false;
-
-        map.once('dragstart', () => {
-            follow = false;
-        });
-
-        map.once('zoomstart', () => {
-            follow = false;
-        });
     } else {
         // update location marker
         stickerState.locationMarker.setLngLat([
             position.coords.longitude,
             position.coords.latitude,
         ]);
-
-        if (follow)
-            map.jumpTo({
-                center: stickerState.locationMarker.getLngLat(),
-            });
     }
 }
 

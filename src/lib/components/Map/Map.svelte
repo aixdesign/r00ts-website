@@ -33,6 +33,7 @@
         addClusterSource,
         toGeoJSON,
     } from "./clusterMarkers.ts";
+    import Sticker from "./Sticker.svelte";
 
     let mapContainer: HTMLDivElement;
     let mapBuildingsContainer: HTMLDivElement;
@@ -326,8 +327,9 @@
                 <Button
                     highlight={showLocation.value}
                     onclick={() => {
-                        if (!map) return;
-                        const showingLocation = getUserLocation(map);
+                        if (!mapBuildingsLayer) return;
+                        const showingLocation =
+                            getUserLocation(mapBuildingsLayer);
                         if (showingLocation) stickerState.placed = true;
                         else stickerState.placed = false;
                     }}
