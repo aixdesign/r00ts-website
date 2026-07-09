@@ -33,7 +33,6 @@
         addClusterSource,
         toGeoJSON,
     } from "./clusterMarkers.ts";
-    import Sticker from "./Sticker.svelte";
     import DataPanel from "../InfoPanels/DataPanel.svelte";
 
     let mapContainer: HTMLDivElement;
@@ -186,7 +185,7 @@
                     ? "none"
                     : "visible";
 
-            if (mapBuildingsLayer.getLayer("cluseters")) {
+            if (mapBuildingsLayer.getLayer("clusters")) {
                 mapBuildingsLayer.setLayoutProperty(
                     "clusters",
                     "visibility",
