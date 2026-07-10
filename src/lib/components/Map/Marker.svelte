@@ -94,8 +94,8 @@
     }
 </script>
 
-<div bind:this={el} {onwheel}>
-    <div class="marker-root" class:front={open}>
+<div bind:this={el} class:front={open} {onwheel}>
+    <div class="marker-root">
         <div
             class="marker"
             class:marker-small={!markerState.largeMarker}
@@ -149,7 +149,6 @@
         transition-duration: 1s !important;
         position: relative;
         cursor: pointer;
-        z-index: 2;
     }
 
     .aerial {
@@ -199,12 +198,12 @@
         font-weight: lighter;
     }
 
+    .front {
+        z-index: 5 !important;
+    }
+
     :global(.datacenter-marker) {
         z-index: 2;
         pointer-events: all;
-    }
-
-    :global(.datacenter-marker:has(.front)) {
-        z-index: 10;
     }
 </style>
