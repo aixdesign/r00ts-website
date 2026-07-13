@@ -88,10 +88,10 @@
             the country of origin of your own IP address to better narrow down the
             list of possible datacenters, however this information is not recorded.
         </p>
-
         <hr />
         <p>Map Legend:</p>
         <MapLegend />
+        <hr />
         <p>
             Map data: <a href="https://openfreemap.org/" target="_blank">
                 OpenFreeMap
@@ -114,6 +114,15 @@
                 target="_blank"
             >
                 Grilli Type
+            </a>
+        </p>
+        <p>
+            <Icon icon="mdi:github" inline={true} />
+            <a
+                href="https://github.com/al165/r00ts-website/tree/main"
+                target="_blank"
+            >
+                View on GitHub
             </a>
         </p>
         <p>©2026 AIxDESIGN</p>
