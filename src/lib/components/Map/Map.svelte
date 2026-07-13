@@ -34,6 +34,7 @@
         toGeoJSON,
     } from "./clusterMarkers.ts";
     import DataPanel from "../InfoPanels/DataPanel.svelte";
+    import AudioButton from "../AudioButton.svelte";
 
     let mapContainer: HTMLDivElement;
     let mapBuildingsContainer: HTMLDivElement;
@@ -316,6 +317,22 @@
     {/if}
 
     <div class="controls">
+        <div class="horizontal">
+            <Tooltip position={TooltipPositions.UPPER_LEFT}>
+                <p>
+                    Disruptive noise by the Vineland Data Centre in New Jersey
+                    recorded by a resident &lt;2km away. Support Sustain SJ, a
+                    local grassroots advocacy group raising awareness to the
+                    impacts of the data center, and educating the paths that
+                    allow their unwanted development in NJ at
+                    <a href="https://www.sustainsj.org" target="_blank">
+                        www.sustainsj.org
+                    </a>, or reach out directly to
+                    <a href="mailto:hello@sustainsj.org">hello@sustainsj.org</a>
+                </p>
+            </Tooltip>
+            <AudioButton />
+        </div>
         <Button onclick={() => fitAll(true)}>Fit all</Button>
         <div class="horizontal">
             <Tooltip position={TooltipPositions.UPPER_LEFT}>

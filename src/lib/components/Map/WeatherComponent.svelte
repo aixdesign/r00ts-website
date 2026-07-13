@@ -1,6 +1,7 @@
 <script lang="ts">
+    import Icon from "@iconify/svelte";
+
     import type { Weather } from "$lib/types";
-    import "iconify-icon";
 
     let { weather }: { weather: Weather | null } = $props();
 
@@ -59,13 +60,7 @@
 <div class="container">
     {#if weather != null && weather.temperature != undefined}
         {#if iconName != ""}
-            <iconify-icon
-                icon={iconName}
-                height="1.2em"
-                style="vertical-align: middle;"
-                noobserver
-            >
-            </iconify-icon>
+            <Icon icon={iconName} inline={true} height="1.2em" />
         {/if}
         {weather?.temperature.toFixed(0)}°C
     {/if}

@@ -78,4 +78,9 @@
             font-size: 48pt;
         }
     }
+
+    :global(a),
+    :global(a:visited) {
+        color: blue;
+    }
 </style>
