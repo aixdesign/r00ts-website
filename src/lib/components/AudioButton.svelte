@@ -31,5 +31,5 @@
 </script>
 
 <Button {onclick}>
-    <Icon icon={iconName} inline={true} />
+    Listen <Icon icon={iconName} inline={true} />
 </Button>
