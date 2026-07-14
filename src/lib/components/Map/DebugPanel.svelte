@@ -8,24 +8,51 @@
 
     interface Props {
         rasteriser: MapRaseriser;
-        mapBuildingsStyle: any;
-        setBuildingStyle: (
-            style: maplibregl.StyleSpecification | string,
-        ) => void;
-        zoomState: { value: number };
+        map: maplibregl.Map;
     }
 
-    let { rasteriser, mapBuildingsStyle, setBuildingStyle, zoomState }: Props =
-        $props();
+    let { rasteriser, map }: Props = $props();
 
     let debugShow = $state(false);
 
     let glyphPalletteCanvas: HTMLCanvasElement;
     let offscreenCanvas: HTMLCanvasElement;
 
+    let zoom = $state(2);
+
+    let style: maplibregl.StyleSpecification | null = $state(null);
+    let colorValue = $state("white");
+
     onMount(() => {
         rasteriser.setOffscreenCanvas(offscreenCanvas);
         rasteriser.rasterPalette.setGlyphPalletteCanvas(glyphPalletteCanvas);
+
+        map.on("zoom", () => {
+            zoom = map.getZoom();
+        });
+
+        map.on("load", () => {
+            style = map.getStyle();
+
+            style.layers.forEach((layer) => {
+                if (layer.type !== "fill" || !layer.paint) return;
+
+                colorValue =
+                    (layer["paint"]["fill-color"] as string) ?? "white";
+            });
+        });
+    });
+
+    $effect(() => {
+        if (!style) return;
+
+        style.layers.forEach((layer) => {
+            if (layer.type !== "fill" || !layer.paint) return;
+
+            layer["paint"]["fill-color"] = colorValue;
+        });
+
+        map.setStyle(style, { diff: true });
     });
 </script>
 
@@ -91,22 +118,7 @@
                     <td></td>
                     <td></td>
                     <td>
-                        <input
-                            type="color"
-                            value={mapBuildingsStyle["layers"][0]["paint"][
-                                "fill-color"
-                            ]}
-                            onchange={(ev) => {
-                                const colour = ev.currentTarget.value;
-                                mapBuildingsStyle["layers"][0]["paint"][
-                                    "fill-color"
-                                ] = colour;
-                                mapBuildingsStyle["layers"][1]["paint"][
-                                    "fill-color"
-                                ] = colour;
-                                setBuildingStyle(mapBuildingsStyle);
-                            }}
-                        />
+                        <input type="color" bind:value={colorValue} />
                     </td>
                     <td></td>
                 </tr>
@@ -128,7 +140,7 @@
             />
             <span id="glyph-size-l">{glyphSize.value}</span>
         </label>
-        <span> Current Zoom: {zoomState.value.toFixed(2)}</span>
+        <span> Current Zoom: {zoom.toFixed(2)}</span>
         <span>
             MarkerState: datacenter.id={markerState.datacenter?.id}
             largeMarker={markerState.largeMarker}

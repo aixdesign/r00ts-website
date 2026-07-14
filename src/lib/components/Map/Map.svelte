@@ -8,9 +8,6 @@
 
     import { syncMaps } from "./utils.ts";
 
-    import mapBuildingsStyle from "./osm_buildings.json";
-    import mapStyle from "./osm_surface.json";
-
     import type { Datacenter } from "$lib/types";
     import DebugPanel from "./DebugPanel.svelte";
     import { MapRaseriser } from "./glyphRenderer.ts";
@@ -35,6 +32,7 @@
     } from "./clusterMarkers.ts";
     import DataPanel from "../InfoPanels/DataPanel.svelte";
     import AudioButton from "../AudioButton.svelte";
+    import { resolve } from "$app/paths";
 
     let mapContainer: HTMLDivElement;
     let mapBuildingsContainer: HTMLDivElement;
@@ -75,11 +73,6 @@
     let bounds: maplibregl.LngLatBounds = $state(new maplibregl.LngLatBounds());
 
     let rasteriser = $state<MapRaseriser | null>(null);
-
-    function setBuildingStyle(style: maplibregl.StyleSpecification | string) {
-        if (mapBuildingsLayer)
-            mapBuildingsLayer.setStyle(style, { diff: true });
-    }
 
     fitAll = (animate: boolean = false) => {
         if (!datacenters || !datacenters.length || !map) return;
@@ -128,7 +121,7 @@
     onMount(() => {
         map = new maplibregl.Map({
             container: mapContainer,
-            style: mapStyle as maplibregl.StyleSpecification,
+            style: resolve("/") + "osm_surface.json",
             center,
             zoom,
             interactive: false,
@@ -138,7 +131,7 @@
 
         mapBuildingsLayer = new maplibregl.Map({
             container: mapBuildingsContainer,
-            style: mapBuildingsStyle as maplibregl.StyleSpecification,
+            style: resolve("/") + "osm_buildings.json",
             center,
             zoom,
             interactive: true,
@@ -307,13 +300,8 @@
         {ondragover}
     ></div>
 
-    {#if showDebug && rasteriser}
-        <DebugPanel
-            {rasteriser}
-            {mapBuildingsStyle}
-            {setBuildingStyle}
-            {zoomState}
-        />
+    {#if showDebug && rasteriser && mapBuildingsLayer}
+        <DebugPanel {rasteriser} map={mapBuildingsLayer} />
     {/if}
 
     <div class="controls">
