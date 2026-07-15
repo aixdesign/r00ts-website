@@ -45,8 +45,17 @@
             <li>Ploipailin Flynn, Research Lead</li>
             <li>Arran Lyon, Researcher + Developer</li>
             <li>Andrea Albiac Casado, Designer</li>
+            <li>Nadia Piet, Creative Direction</li>
         </ul>
-        <p>with generous support from Stimuleringsfonds.</p>
+        <p>
+            with generous support from Stimuleringsfonds Creative Industries —
+            <a
+                href="https://www.stimuleringsfonds.nl/en/awarded-grants/open-oproep-grounding-the-cloud-8-projecten-geselecteerd"
+                target="_blank"
+            >
+                "Grounding the Cloud" Open Call
+            </a>
+        </p>
 
         <h3>We're still digging</h3>
         <p>
@@ -65,7 +74,11 @@
             where r00ts goes next. Whether you've got a data center story, a
             technical lead, or just good questions — pull up a chair.
         </p>
-        <p>[ Sign up for the August workshop ]</p>
+        <p>
+            [ <a href="https://luma.com/3gk55ede" target="_blank">
+                Sign up for the August playtest
+            </a> ]
+        </p>
 
         <h3>Privacy</h3>
         <p>
@@ -131,12 +144,26 @@
             </a>
         </p>
         <p>
+            Open source under <a
+                href="https://github.com/aixdesign/r00ts-website/blob/main/LICENSE"
+                target="_blank"
+            >
+                AGPL-3.0
+            </a>
+            ·
             <Icon icon="mdi:github" inline={true} />
             <a
                 href="https://github.com/aixdesign/r00ts-website"
                 target="_blank"
             >
-                View on GitHub
+                View the code
+            </a>
+            ·
+            <a
+                href="https://nadiapiet.notion.site/r00ts-Privacy-Policy-39d37d00383380ecb3befa8325c00a6e"
+                target="_blank"
+            >
+                Privacy
             </a>
         </p>
         <p>©2026 AIxDESIGN</p>
@@ -151,7 +178,7 @@
 
     .container,
     .panel {
-        width: 450px;
+        width: 500px;
     }
 
     .container {
