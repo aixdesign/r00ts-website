@@ -59,7 +59,7 @@
 
     let {
         zoom = 2,
-        center = [0, 0],
+        center = [0, 20],
         datacenters,
         showDebug = false,
         leftPadding = 100,
@@ -305,6 +305,7 @@
     {/if}
 
     <div class="controls">
+        <Button onclick={() => fitAll(true)}>Fit all</Button>
         <div class="horizontal">
             <Tooltip position={TooltipPositions.UPPER_LEFT}>
                 <p>
@@ -321,7 +322,6 @@
             </Tooltip>
             <AudioButton />
         </div>
-        <Button onclick={() => fitAll(true)}>Fit all</Button>
         <div class="horizontal">
             <Tooltip position={TooltipPositions.UPPER_LEFT}>
                 <p>
