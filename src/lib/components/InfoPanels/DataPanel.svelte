@@ -222,7 +222,7 @@
 
     .container {
         position: absolute;
-        z-index: 11;
+        z-index: 3;
         width: 350px;
     }
 
@@ -243,6 +243,7 @@
     .ip-list {
         flex-grow: 2;
         overflow-y: scroll;
+        max-height: 200px;
         display: flex;
         flex-direction: column;
         white-space-collapse: preserve-spaces;

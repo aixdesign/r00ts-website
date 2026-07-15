@@ -57,6 +57,7 @@
         padding: 0;
         font-family: "GT Pressura Mono", monospace;
         font-variant-numeric: slashed-zero;
+        overflow: hidden;
     }
 
     h1 {
