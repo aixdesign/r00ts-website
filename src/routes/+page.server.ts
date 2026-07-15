@@ -17,7 +17,7 @@ export async function load({ url }) {
 
     if (data64) {
         try {
-            data = JSON.parse(atob(data64));
+            data = JSON.parse(decodeURIComponent(atob(data64)));
 
             if (!data.hasOwnProperty('facility_ids'))
                 throw new Error('`data` does not contain facility_ids');
