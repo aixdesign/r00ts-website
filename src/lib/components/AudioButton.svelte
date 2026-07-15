@@ -26,7 +26,7 @@
     }
 
     let iconName = $derived(
-        isPlaying ? "fluent:pause-20-filled" : "fluent:play-20-filled",
+        isPlaying ? "fluent:speaker-2-24-filled" : "fluent:speaker-0-24-filled",
     );
 </script>
 
