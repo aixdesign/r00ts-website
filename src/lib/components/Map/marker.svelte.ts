@@ -16,10 +16,11 @@ export const markerState = {
     set largeMarker(v: boolean) { largeMarker = v },
 };
 
-export function selectDatacenter(map: maplibregl.Map, datacenter: Datacenter) {
+export function selectDatacenter(map: maplibregl.Map, datacenter: Datacenter, animate: boolean = true) {
     markerState.datacenter = datacenter;
 
-    map?.flyTo({
+    map.flyTo({
+        animate,
         zoom: 16,
         center: [markerState.datacenter.lon, markerState.datacenter.lat],
         duration: 1000,

@@ -4,14 +4,16 @@
     import { GLYPH_FUNCTIONS, MapRaseriser } from "./glyphRenderer.ts";
     import { onMount } from "svelte";
 
-    import { markerState } from "./marker.svelte.ts";
+    import { markerState, selectDatacenter } from "./marker.svelte.ts";
+    import type { Datacenter } from "$lib/types";
 
     interface Props {
         rasteriser: MapRaseriser;
         map: maplibregl.Map;
+        datacenters?: Datacenter[];
     }
 
-    let { rasteriser, map }: Props = $props();
+    let { rasteriser, map, datacenters = [] }: Props = $props();
 
     let debugShow = $state(false);
 
@@ -54,6 +56,29 @@
 
         map.setStyle(style, { diff: true });
     });
+
+    function slowZoomOut() {
+        if (!markerState.datacenter) return;
+
+        debugShow = false;
+
+        map.jumpTo({
+            center: [markerState.datacenter.lon, markerState.datacenter.lat],
+            zoom: 16,
+        });
+
+        setTimeout(() => {
+            map.easeTo({ zoom: 2, duration: 30000 });
+        }, 2000);
+    }
+
+    function randomDatacenter() {
+        if (!datacenters.length) return;
+
+        const idx = Math.floor(Math.random() * datacenters.length);
+
+        selectDatacenter(map, datacenters[idx], false);
+    }
 </script>
 
 <div
@@ -145,6 +170,9 @@
             MarkerState: datacenter.id={markerState.datacenter?.id}
             largeMarker={markerState.largeMarker}
         </span>
+        <button onclick={slowZoomOut}>slowZoomOut</button>
+        <span>Number of datacenters: {datacenters.length}</span>
+        <button onclick={randomDatacenter}>random</button>
     </div>
 </div>
 

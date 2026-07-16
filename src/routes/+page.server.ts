@@ -6,6 +6,7 @@ export async function load({ url }) {
     const showDebug: boolean = url.searchParams.get('debug') ? true : false;
     const data64 = url.searchParams.get('data');
     let submit = url.searchParams.get('submit') === "true" ? true : false;
+    const hideUI = url.searchParams.get('hideui') ? true : false;
 
     let datacenters: Datacenter[] = [];
     let data: any;
@@ -39,5 +40,5 @@ export async function load({ url }) {
         datacenters = getAllDatacenters();
     }
 
-    return { datacenters, showDebug, entries, networks, networksDatacenters, pageUrl, networkIps, submit };
+    return { datacenters, showDebug, entries, networks, networksDatacenters, pageUrl, networkIps, submit, hideUI };
 }

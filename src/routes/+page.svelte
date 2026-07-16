@@ -62,20 +62,23 @@
         leftPadding={data.entries ? 500 : 100}
         bind:fitAll
         zoomOnLoad={inSession}
+        hideUI={data.hideUI}
     >
-        {#if inSession}
-            <SessionPanel />
-            <IpPanel />
-            <SummaryPanel autoSubmit={data.submit} />
-        {:else}
-            <SearchBar bind:hasFocus={searchFocused} {fitAll}></SearchBar>
-            <a href="https://github.com/aixdesign/r00ts-extension/releases">
-                <button id="r00ts-download-btn">
-                    Download the extension (Firefox and Chrome!)
-                </button>
-            </a>
+        {#if !data.hideUI}
+            {#if inSession}
+                <SessionPanel />
+                <IpPanel />
+                <SummaryPanel autoSubmit={data.submit} />
+            {:else}
+                <SearchBar bind:hasFocus={searchFocused} {fitAll}></SearchBar>
+                <a href="https://github.com/aixdesign/r00ts-extension/releases">
+                    <button id="r00ts-download-btn">
+                        Download the extension (Firefox and Chrome!)
+                    </button>
+                </a>
+            {/if}
+            <AboutPanel bind:show={showAbout} />
         {/if}
-        <AboutPanel bind:show={showAbout} />
     </Map>
 </div>
 

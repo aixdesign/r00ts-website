@@ -54,6 +54,7 @@
         children?: any;
         leftPadding: number;
         zoomOnLoad?: boolean;
+        hideUI?: boolean;
         fitAll: (animate: boolean) => void;
     }
 
@@ -65,6 +66,7 @@
         leftPadding = 100,
         fitAll = $bindable(),
         zoomOnLoad = false,
+        hideUI = false,
         children,
     }: Props = $props();
 
@@ -301,59 +303,64 @@
     ></div>
 
     {#if showDebug && rasteriser && mapBuildingsLayer}
-        <DebugPanel {rasteriser} map={mapBuildingsLayer} />
+        <DebugPanel {rasteriser} map={mapBuildingsLayer} {datacenters} />
     {/if}
-
-    <div class="controls">
-        <Button onclick={() => fitAll(true)}>Fit all</Button>
-        <div class="horizontal">
-            <Tooltip position={TooltipPositions.UPPER_LEFT}>
-                <p>
-                    Disruptive noise by the Vineland Data Centre in New Jersey
-                    recorded by a resident &lt;2km away. Support Sustain SJ, a
-                    local grassroots advocacy group raising awareness to the
-                    impacts of the data center, and educating the paths that
-                    allow their unwanted development in NJ at
-                    <a href="https://www.sustainsj.org" target="_blank">
-                        www.sustainsj.org
-                    </a>, or reach out directly to
-                    <a href="mailto:hello@sustainsj.org">hello@sustainsj.org</a>
-                </p>
-            </Tooltip>
-            <AudioButton />
+    {#if !hideUI}
+        <div class="controls">
+            <Button onclick={() => fitAll(true)}>Fit all</Button>
+            <div class="horizontal">
+                <Tooltip position={TooltipPositions.UPPER_LEFT}>
+                    <p>
+                        Disruptive noise by the Vineland Data Centre in New
+                        Jersey recorded by a resident &lt;2km away. Support
+                        Sustain SJ, a local grassroots advocacy group raising
+                        awareness to the impacts of the data center, and
+                        educating the paths that allow their unwanted
+                        development in NJ at
+                        <a href="https://www.sustainsj.org" target="_blank">
+                            www.sustainsj.org
+                        </a>, or reach out directly to
+                        <a href="mailto:hello@sustainsj.org"
+                            >hello@sustainsj.org</a
+                        >
+                    </p>
+                </Tooltip>
+                <AudioButton />
+            </div>
+            <div class="horizontal">
+                <Tooltip position={TooltipPositions.UPPER_LEFT}>
+                    <p>
+                        Drag the sticker to indicate your location, or click
+                        "Locate" to estimate your location.
+                    </p>
+                    <p>
+                        This uses your browser's location services, which
+                        requires your permission, and might not be accurate on
+                        desktop.
+                    </p>
+                    <p>Click on the marker on the map to remove it.</p>
+                </Tooltip>
+                <StickerPalette />
+                {#if "geolocation" in navigator}
+                    <Button
+                        highlight={showLocation.value}
+                        onclick={() => {
+                            if (!mapBuildingsLayer) return;
+                            const showingLocation =
+                                getUserLocation(mapBuildingsLayer);
+                            if (showingLocation) stickerState.placed = true;
+                            else stickerState.placed = false;
+                        }}
+                    >
+                        Locate
+                        {#if stickerState.loading}
+                            <span class="loader"></span>
+                        {/if}
+                    </Button>
+                {/if}
+            </div>
         </div>
-        <div class="horizontal">
-            <Tooltip position={TooltipPositions.UPPER_LEFT}>
-                <p>
-                    Drag the sticker to indicate your location, or click
-                    "Locate" to estimate your location.
-                </p>
-                <p>
-                    This uses your browser's location services, which requires
-                    your permission, and might not be accurate on desktop.
-                </p>
-                <p>Click on the marker on the map to remove it.</p>
-            </Tooltip>
-            <StickerPalette />
-            {#if "geolocation" in navigator}
-                <Button
-                    highlight={showLocation.value}
-                    onclick={() => {
-                        if (!mapBuildingsLayer) return;
-                        const showingLocation =
-                            getUserLocation(mapBuildingsLayer);
-                        if (showingLocation) stickerState.placed = true;
-                        else stickerState.placed = false;
-                    }}
-                >
-                    Locate
-                    {#if stickerState.loading}
-                        <span class="loader"></span>
-                    {/if}
-                </Button>
-            {/if}
-        </div>
-    </div>
+    {/if}
     {@render children?.()}
 </div>
 
