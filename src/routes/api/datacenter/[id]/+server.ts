@@ -11,7 +11,7 @@ export async function GET({ params }) {
     if (parseInt(id) < 0)
         error(400, 'Id out of range');
 
-    const datacenter = await getDatacenter(parseInt(id));
+    const { datacenter, networks } = await getDatacenter(parseInt(id));
 
-    return json({ datacenter });
+    return json({ datacenter, networks });
 }

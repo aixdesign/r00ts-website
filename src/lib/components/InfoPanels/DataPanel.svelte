@@ -1,6 +1,7 @@
 <script lang="ts">
-    import type { Datacenter } from "$lib/types";
+    import type { Datacenter, Network } from "$lib/types";
     import { dataState } from "./data.svelte";
+    import { markerState } from "../Map/marker.svelte";
     import Tooltip from "./Tooltip.svelte";
     import { padIp } from "$lib/ip_utils";
     import { onDestroy, onMount } from "svelte";
@@ -12,36 +13,25 @@
 
     let { map, datacenter }: Props = $props();
 
-    let networks = $derived.by(() => {
-        if (
-            datacenter.id == undefined ||
-            !dataState.networks ||
-            !dataState.networksDatacenters
-        )
-            return [];
+    let networks: Network[] = $derived.by(() => {
+        if (datacenter.id == undefined) return [];
 
-        let network_list: string[] = [];
+        if (markerState.networks.length) {
+            return markerState.networks;
+        }
+
+        if (!dataState.networks || !dataState.networksDatacenters) {
+            return [];
+        }
+
+        let network_list: Network[] = [];
         for (const [network_id, datacenters] of Object.entries(
             dataState.networksDatacenters,
         )) {
             if (datacenters.includes(datacenter.id))
-                network_list.push(
-                    dataState.networks[parseInt(network_id)].network_name,
-                );
+                network_list.push(dataState.networks[parseInt(network_id)]);
         }
         return network_list;
-    });
-
-    let networksString = $derived.by(() => {
-        if (networks.length == 0) return "on an unknown network";
-        else if (networks.length == 1) return `on the ${networks[0]} network`;
-        else {
-            return (
-                "on the " +
-                networks.slice(0, -1).join(", ") +
-                ` and ${networks.at(-1)} networks`
-            );
-        }
     });
 
     let ips = $derived.by(() => {
@@ -198,7 +188,19 @@
             </p>
         {/if}
         {#if networks.length}
-            This datacenter is {networksString}.
+            <!-- This datacenter is {networksString}. -->
+            <p>Networks registered to this center:</p>
+            <div class="ip-list">
+                {#each networks as network}
+                    <a
+                        href="https://www.peeringdb.com/net/{network.net_id}"
+                        target="_blank"
+                        class="indent"
+                    >
+                        {network.network_name}
+                    </a>
+                {/each}
+            </div>
         {/if}
         {#if ips.length > 0}
             <p>Potentially served:</p>

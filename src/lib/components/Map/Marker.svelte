@@ -2,7 +2,7 @@
     import { resolve } from "$app/paths";
     import { untrack } from "svelte";
 
-    import type { Datacenter, Weather } from "$lib/types";
+    import type { Datacenter, Network, Weather } from "$lib/types";
 
     import maplibregl from "maplibre-gl";
     import WeatherComponent from "./WeatherComponent.svelte";
@@ -17,6 +17,9 @@
     } = $props();
 
     let el: HTMLDivElement;
+
+    let fetchedNetworks = false;
+    let networks: Network[] = $state.raw([]);
 
     $effect(() => {
         const marker = untrack(() => {
@@ -46,8 +49,6 @@
 
     function onclick(ev?: MouseEvent) {
         ev?.stopPropagation();
-
-        selectDatacenter(map, datacenter);
 
         if (datacenter.filename == null && datacenter.precise) {
             fetch(`${aerialAPI}${datacenter.id}`)
@@ -82,6 +83,26 @@
                     );
                 });
         }
+
+        if (!fetchedNetworks) {
+            fetchedNetworks = true;
+            markerState.networks = [];
+            const datacenterURL = resolve("/api/datacenter/");
+
+            fetch(`${datacenterURL}${datacenter.id}`)
+                .then((res) => res.json())
+                .then((data) => {
+                    console.log(data.networks);
+                    markerState.networks = networks = data.networks;
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+        } else {
+            markerState.networks = networks;
+        }
+
+        selectDatacenter(map, datacenter);
     }
 
     function onwheel(e: WheelEvent) {

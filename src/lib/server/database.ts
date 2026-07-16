@@ -248,7 +248,14 @@ export async function getDatacenter(id: number) {
     if (!datacenter)
         return { success: false, reason: `Data center not found with id ${id}` };
 
-    return { success: true, datacenter }
+    let networks = db.prepare(
+        `
+        SELECT id, net_id, network_name, organisation_name, description, asn 
+        FROM Networks n JOIN NetworksDatacenters nd ON n.id = nd.network_id 
+        WHERE nd.datacenter_id = ?`
+    ).all(id) as Network[];
+
+    return { success: true, datacenter, networks }
 }
 
 function iterativeSearch(asn: number, country_code?: string, city?: string): Datacenter[] {

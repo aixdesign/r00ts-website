@@ -1,6 +1,7 @@
-import type { Datacenter } from "$lib/types";
+import type { Datacenter, Network } from "$lib/types";
 
 let datacenter: Datacenter | null = $state(null);
+let networks: Network[] = $state.raw([]);
 let highlighted: number[] = $state.raw([]);
 let preview: number[] = $state.raw([]);
 let largeMarker: boolean = $state(false);
@@ -8,6 +9,8 @@ let largeMarker: boolean = $state(false);
 export const markerState = {
     get datacenter(): Datacenter | null { return datacenter },
     set datacenter(v: Datacenter | null) { datacenter = v },
+    get networks(): Network[] { return networks },
+    set networks(v: Network[]) { networks = v },
     get highlighted(): number[] { return highlighted },
     set highlighted(v: number[]) { highlighted = v },
     get preview(): number[] { return preview },
