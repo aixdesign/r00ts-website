@@ -190,7 +190,7 @@
         {#if networks.length}
             <!-- This datacenter is {networksString}. -->
             <p>Networks registered to this center:</p>
-            <div class="ip-list">
+            <div class="network-list">
                 {#each networks as network}
                     <a
                         href="https://www.peeringdb.com/net/{network.net_id}"
@@ -242,13 +242,21 @@
         padding-left: 1em;
     }
 
+    .network-list,
     .ip-list {
         flex-grow: 2;
         overflow-y: scroll;
-        max-height: 200px;
         display: flex;
         flex-direction: column;
         white-space-collapse: preserve-spaces;
+    }
+
+    .ip-list {
+        max-height: 200px;
+    }
+
+    .network-list {
+        max-height: 90px;
     }
 
     @media (width < 720px) {
