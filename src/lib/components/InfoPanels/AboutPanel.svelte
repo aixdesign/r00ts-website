@@ -31,16 +31,17 @@
         </p>
         <p>
             A single webpage pulls from data centers all over — some near(ish)
-            you, some hundreds of kms away.
+            you, some hundreds of kms away, to serve you the webpage you see in
+            your browser.
         </p>
         <p>
-            r00ts traces your browser session back to those places. So the next
-            time you hear about data center droughts, land rights battles, or
-            the communities pushing back, you can find out if you're part of
-            their story too.
+            <em>r00ts</em> traces your browser session back to those places. So the
+            next time you hear about data center droughts, land rights battles, or
+            the communities pushing back, you can find out if you're part of their
+            story too.
         </p>
         <h3>Team</h3>
-        <p>r00ts was created by AIxDESIGN including:</p>
+        <p><em>r00ts</em> was created by AIxDESIGN including:</p>
         <ul>
             <li>Ploipailin Flynn, Research Lead</li>
             <li>Arran Lyon, Researcher + Developer</li>
@@ -80,38 +81,38 @@
             </a> ]
         </p>
 
-        <h3>Privacy</h3>
-        <p>
-            <em>r00ts.xyz</em> does not record your browsing history nor collect
-            <em>any</em> information about your access to the site. We do not use
-            any cookies or tracking technologies. If you use the "Locate" feature,
-            this information stays within your browser and we do not see it.
-        </p>
-        <p>
-            <em>r00ts</em> browser extension, by it's very nature, records the IP
-            addresses of all web traffic of the webpage in the tab it is open in.
-            These IP addresses and domains are sent to our server for the purpose
-            of looking up who owns the IP block, and therefore the datacenters that
-            might facilitate the address.
-        </p>
-        <p>
-            The extension does not record anything else about the web requests,
-            such as transmitted data or user agent info. URLs are stripped of
-            any sub-domains, paths or queries — only the base hostname is sent
-            to our server. The extension does not send any identifiable
-            information that can be linked to a user, device or browsing
-            session. Our server <em>does</em> check the country of origin of your
-            own IP address to better narrow down the list of possible datacenters,
-            however this information is not recorded.
-        </p>
-        <p>
-            You have the option to anonymously contribute your results for a
-            website to the community database that other vistors can query with
-            the search bar. Your submission will be combined with all other
-            results for the submitted website and are not stored as an
-            individual entry.
-        </p>
-
+        <!-- <h3>Privacy</h3> -->
+        <!-- <p> -->
+        <!--     <em>r00ts.xyz</em> does not record your browsing history nor collect -->
+        <!--     <em>any</em> information about your access to the site. We do not use -->
+        <!--     any cookies or tracking technologies. If you use the "Locate" feature, -->
+        <!--     this information stays within your browser and we do not see it. -->
+        <!-- </p> -->
+        <!-- <p> -->
+        <!--     <em>r00ts</em> browser extension, by it's very nature, records the IP -->
+        <!--     addresses of all web traffic of the webpage in the tab it is open in. -->
+        <!--     These IP addresses and domains are sent to our server for the purpose -->
+        <!--     of looking up who owns the IP block, and therefore the datacenters that -->
+        <!--     might facilitate the address. -->
+        <!-- </p> -->
+        <!-- <p> -->
+        <!--     The extension does not record anything else about the web requests, -->
+        <!--     such as transmitted data or user agent info. URLs are stripped of -->
+        <!--     any sub-domains, paths or queries — only the base hostname is sent -->
+        <!--     to our server. The extension does not send any identifiable -->
+        <!--     information that can be linked to a user, device or browsing -->
+        <!--     session. Our server <em>does</em> check the country of origin of your -->
+        <!--     own IP address to better narrow down the list of possible datacenters, -->
+        <!--     however this information is not recorded. -->
+        <!-- </p> -->
+        <!-- <p> -->
+        <!--     You have the option to anonymously contribute your results for a -->
+        <!--     website to the community database that other vistors can query with -->
+        <!--     the search bar. Your submission will be combined with all other -->
+        <!--     results for the submitted website and are not stored as an -->
+        <!--     individual entry. -->
+        <!-- </p> -->
+        <!---->
         <hr />
 
         <p>Map Legend:</p>
@@ -150,20 +151,20 @@
             >
                 AGPL-3.0
             </a>
-            ·
-            <Icon icon="mdi:github" inline={true} />
             <a
                 href="https://github.com/aixdesign/r00ts-website"
                 target="_blank"
             >
                 View the code
+                <Icon icon="mdi:github" inline={true} />
             </a>
-            ·
+        </p>
+        <p>
             <a
                 href="https://nadiapiet.notion.site/r00ts-Privacy-Policy-39d37d00383380ecb3befa8325c00a6e"
                 target="_blank"
             >
-                Privacy
+                Privacy Statement
             </a>
         </p>
         <p>©2026 AIxDESIGN</p>

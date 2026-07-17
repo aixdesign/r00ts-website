@@ -13,12 +13,14 @@
 
     let num_ips = $derived(Object.keys(dataState.entries).length);
     let num_datacenters = $derived(dataState.datacenters.length);
-    let cities = $derived.by(() => {
+    let city_data = $derived.by(() => {
         let names = Array.from(
             new Set(dataState.datacenters.map((dc) => dc.city)),
         );
 
-        if (names.length == 1) return names[0];
+        let num = names.length;
+
+        if (names.length == 1) return { num, string: names[0] };
 
         if (names.length > 6) {
             const more = names.length - 5;
@@ -29,7 +31,7 @@
         let list = names.slice(0, -1).join(", ");
         list = `${list} and ${names.at(-1)}`;
 
-        return list;
+        return { num, string: list };
     });
 
     let submitButton: HTMLButtonElement | undefined = $state();
@@ -99,9 +101,7 @@
                     <p>
                         It's made up of many elements — text, images, fonts,
                         dynamic bits like this map — and each element can come
-                        from a different service. The words might load from one
-                        server, the images from another, the fonts from Google,
-                        this map from OpenStreetMap.
+                        from a different service.
                     </p>
                     <p>Each one of those can have its own IP address.</p>
                 </Tooltip>
@@ -114,26 +114,44 @@
                     {num_datacenters}
                     {num_datacenters == 1 ? "datacenter" : "datacenters"}
                 </span>
-                <Tooltip background="cyan">
-                    <h2>Why so many data centers?</h2>
-                    <p>
-                        Tracing an IP address to one datacenter is tricky, but
-                        here's what we know so far: some of these IP addresses
-                        bring us to this location, and this location is home to
-                        {num_datacenters} data centers. Any of them could be supporting
-                        this website.
-                    </p>
-                </Tooltip>
+                {#if num_datacenters > 1}
+                    <Tooltip background="cyan">
+                        <h2>Why so many data centers?</h2>
+                        {#if num_ips > 1}
+                            <p>
+                                Multiple IP addresses can be served from
+                                different datacenters for a single website,
+                                depending on what resources the webpage needs
+                            </p>
+                        {/if}
+                        <p>
+                            Tracing an IP address to a single datacenter is
+                            tricky, but here is what we know so far:
+                            {num_ips > 1
+                                ? "these IP addresses are"
+                                : "this IP address is"} attributed to
+                            {num_datacenters > 1
+                                ? `${num_datacenters} datacenters`
+                                : "this datacenter"}
+                            that leads us to
+                            {city_data.num > 1
+                                ? "these locations"
+                                : `in ${city_data.string}`}
+                        </p>
+                    </Tooltip>
+                {/if}
             </li>
             <li>
                 {num_datacenters == 1 ? "In" : "Across"}
-                <span class="stat"> {cities} </span>
+                <span class="stat"> {city_data.string} </span>
                 <Tooltip background="#8ff0a4">
                     <h2>Why so many cities?</h2>
                     <p>
                         Every IP address offers clues about where it's rooted —
-                        a bit like a postcode. These clues have lead us to these
-                        cities.
+                        a bit like a postcode. These clues have lead us to
+                        {city_data.num > 1
+                            ? `these ${city_data.num} cities`
+                            : `this city`}
                     </p>
                 </Tooltip>
             </li>
