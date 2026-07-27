@@ -7,6 +7,7 @@ export async function load({ url }) {
     const data64 = url.searchParams.get('data');
     let submit = url.searchParams.get('submit') === "true" ? true : false;
     const hideUI = url.searchParams.get('hideui') ? true : false;
+    const datacenterId = url.searchParams.get('datacenter');
 
     let datacenters: Datacenter[] = [];
     let data: any;
@@ -41,5 +42,16 @@ export async function load({ url }) {
         datacenters = getAllDatacenters();
     }
 
-    return { datacenters, showDebug, entries, networks, networksDatacenters, pageUrl, networkIps, submit, hideUI };
+    let focusDatacenter: Datacenter | null = null;
+    if (datacenterId && parseInt(datacenterId)) {
+        const id = parseInt(datacenterId);
+        for (const dc of datacenters) {
+            if (dc.id != id) continue;
+
+            focusDatacenter = dc;
+            break;
+        }
+    }
+
+    return { datacenters, showDebug, entries, networks, networksDatacenters, pageUrl, networkIps, submit, hideUI, focusDatacenter };
 }

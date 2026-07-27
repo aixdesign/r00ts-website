@@ -13,7 +13,7 @@
     import { MapRaseriser } from "./glyphRenderer.ts";
     import { glyphSize } from "./glyphState.svelte.ts";
     import Marker from "./Marker.svelte";
-    import { markerState } from "./marker.svelte.ts";
+    import { markerState, selectDatacenter } from "./marker.svelte.ts";
 
     import Tooltip from "../InfoPanels/Tooltip.svelte";
     import { TooltipPositions } from "../InfoPanels/tooltip.svelte.ts";
@@ -55,6 +55,7 @@
         leftPadding: number;
         zoomOnLoad?: boolean;
         hideUI?: boolean;
+        focusDatacenter?: Datacenter | null;
         fitAll: (animate: boolean) => void;
     }
 
@@ -67,6 +68,7 @@
         fitAll = $bindable(),
         zoomOnLoad = false,
         hideUI = false,
+        focusDatacenter,
         children,
     }: Props = $props();
 
@@ -187,8 +189,10 @@
 
             if (
                 mapBuildingsLayer.getLayer("clusters") &&
-                mapBuildingsLayer.getLayoutProperty("clusters", "visibility") !==
-                    visible
+                mapBuildingsLayer.getLayoutProperty(
+                    "clusters",
+                    "visibility",
+                ) !== visible
             ) {
                 mapBuildingsLayer.setLayoutProperty(
                     "clusters",
@@ -220,6 +224,8 @@
             }).observe(mapCanvas);
 
             if (zoomOnLoad) fitAll(true);
+
+            if (focusDatacenter && map) selectDatacenter(map, focusDatacenter);
         });
 
         mapBuildingsLayer.on("click", () => {
@@ -277,7 +283,11 @@
 
     let visibleMarkers = $derived(
         showMarkers && datacenters
-            ? datacenters.filter((dc) => bounds.contains([dc.lon, dc.lat]))
+            ? datacenters.filter(
+                  (dc) =>
+                      dc.id === focusDatacenter?.id ||
+                      bounds.contains([dc.lon, dc.lat]),
+              )
             : [],
     );
 </script>

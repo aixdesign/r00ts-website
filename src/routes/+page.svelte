@@ -63,6 +63,7 @@
         bind:fitAll
         zoomOnLoad={inSession}
         hideUI={data.hideUI}
+        focusDatacenter={data.focusDatacenter}
     >
         {#if !data.hideUI}
             {#if inSession}
