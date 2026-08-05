@@ -188,7 +188,6 @@ export class RasteriserPalette {
             this.addGlyph(glyphFn.name, glyphFn.fn)
 
         this.setGlyphSize(this.glyphSize);
-        this.renderGlyphPalette();
     }
 
     setGlyphPalletteCanvas(glyphPaletteCanvas: HTMLCanvasElement) {
@@ -196,7 +195,6 @@ export class RasteriserPalette {
         this.glyphPaletteCtx = this.glyphPaletteCanvas.getContext('2d');
 
         this.setGlyphSize(this.glyphSize);
-        this.renderGlyphPalette();
     }
 
     addGlyph(glyphName: string, drawFn: GlyphDrawFn) {
@@ -240,7 +238,6 @@ export class RasteriserPalette {
         }
 
         this.glyphCache.clear();
-
         this.renderGlyphPalette();
     }
 
@@ -455,15 +452,16 @@ export class MapRaseriser {
         if (newSize == this.glyphSize)
             return;
 
-        this.rasterPalette.setGlyphSize(newSize);
-
-        this.resize();
+        this.glyphSize = newSize;
+        this.rasterPalette.setGlyphSize(newSize).then(() => {
+            this.resize();
+        });
     }
 
     refresh() {
-        this.rasterPalette.setGlyphSize(this.glyphSize);
-        this.rasterPalette.renderGlyphPalette();
-        this.renderGlyphs();
+        this.rasterPalette.setGlyphSize(this.glyphSize).then(() => {
+            this.renderGlyphs();
+        });
     }
 
 }
