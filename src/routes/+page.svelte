@@ -70,9 +70,20 @@
                 <SessionPanel />
                 <IpPanel />
                 <SummaryPanel autoSubmit={data.submit} />
+                <a
+                    href="https://github.com/aixdesign/r00ts-extension/releases"
+                    target="_blank"
+                >
+                    <button id="r00ts-download-btn" class="top-right">
+                        Download the extension (Firefox and Chrome!)
+                    </button>
+                </a>
             {:else}
                 <SearchBar bind:hasFocus={searchFocused} {fitAll}></SearchBar>
-                <a href="https://github.com/aixdesign/r00ts-extension/releases">
+                <a
+                    href="https://github.com/aixdesign/r00ts-extension/releases"
+                    target="_blank"
+                >
                     <button id="r00ts-download-btn">
                         Download the extension (Firefox and Chrome!)
                     </button>
@@ -102,6 +113,16 @@
         background: #ff70b3;
         border: none;
         cursor: pointer;
+    }
+
+    #r00ts-download-btn.top-right {
+        bottom: auto;
+        left: auto;
+        top: 4em;
+        right: 1em;
+        z-index: 6;
+        padding: 0.5em 1em;
+        font-size: 10pt;
     }
 
     @media (width < 720px) {

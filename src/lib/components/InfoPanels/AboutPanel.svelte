@@ -40,6 +40,21 @@
             the communities pushing back, you can find out if you're part of their
             story too.
         </p>
+        <p>Download the extension:</p>
+        <p>
+            [ <a
+                href="https://chromewebstore.google.com/detail/r00ts/gaehnhjddofldjjeclcdieclklfaonod"
+                target="_blank"
+            >
+                Chrome Web Store
+            </a> ]
+            [ <a
+                href="https://github.com/aixdesign/r00ts-extension/releases"
+                target="_blank"
+            >
+                GitHub (Firefox + manual install)
+            </a> ]
+        </p>
         <h3>Team</h3>
         <p>
             <em>r00ts</em> was created by

@@ -110,7 +110,7 @@
         <div class="message">
             No one has traced this website yet, so we can't tell you anything
             from here. Want to know where it's rooted? <a
-                href="https://github.com/aixdesign/r00ts-extension/releases"
+                href="https://github.com/aixdesign/r00ts-extension"
                 target="_blank">Install the extension</a
             > and trace it yourself!
         </div>
