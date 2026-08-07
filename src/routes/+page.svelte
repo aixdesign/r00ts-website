@@ -72,7 +72,10 @@
                 <SummaryPanel autoSubmit={data.submit} />
             {:else}
                 <SearchBar bind:hasFocus={searchFocused} {fitAll}></SearchBar>
-                <a href="https://github.com/aixdesign/r00ts-extension/releases">
+                <a
+                    href="https://github.com/aixdesign/r00ts-extension/releases"
+                    target="_blank"
+                >
                     <button id="r00ts-download-btn">
                         Download the extension (Firefox and Chrome!)
                     </button>

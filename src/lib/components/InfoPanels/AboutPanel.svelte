@@ -40,13 +40,32 @@
             the communities pushing back, you can find out if you're part of their
             story too.
         </p>
+        <p>Download the extension:</p>
+        <p>
+            [ <a
+                href="https://chromewebstore.google.com/detail/r00ts/gaehnhjddofldjjeclcdieclklfaonod"
+                target="_blank"
+            >
+                Chrome Web Store
+            </a> ]
+            [ <a
+                href="https://github.com/aixdesign/r00ts-extension/releases"
+                target="_blank"
+            >
+                GitHub (Firefox + manual install)
+            </a> ]
+        </p>
         <h3>Team</h3>
         <p>
             <em>r00ts</em> was created by
             <a href="https://aixdesign.co" target="_blank">AIxDESIGN</a> including:
         </p>
         <ul>
-            <li>Ploipailin Flynn, Research Lead</li>
+            <li>
+                <a href="https://ploipail.in/" target="_blank">
+                    Ploipailin Flynn
+                </a>, Project Lead
+            </li>
             <li>
                 <a href="https://arranlyon.com" target="_blank">
                     Arran Lyon
@@ -57,7 +76,11 @@
                     Andrea Albiac Casado
                 </a>, Designer
             </li>
-            <li>Nadia Piet, Creative Direction</li>
+            <li>
+                <a href="https://nadiapiet.com/" target="_blank">
+                    Nadia Piet
+                </a>, Creative Direction
+            </li>
         </ul>
         <p>
             with generous support from Stimuleringsfonds Creative Industries —
