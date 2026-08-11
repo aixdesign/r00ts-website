@@ -36,13 +36,12 @@
                                         * {entry.clue.city}
                                     </HoverTip>
                                 {:else if entry.clue?.code}
-                                    <span
-                                        class="clue"
-                                        title="This entry has a clue that suggests the nearest airport has IATA airport code {entry
+                                    <HoverTip
+                                        text="This entry has a clue that suggests the nearest airport has IATA airport code {entry
                                             .clue.code}"
                                     >
                                         * {entry.clue.code}
-                                    </span>
+                                    </HoverTip>
                                 {/if}
                             </td>
                         </tr>
