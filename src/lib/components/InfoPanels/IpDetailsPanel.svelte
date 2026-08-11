@@ -28,9 +28,21 @@
                             </td>
                             <td>
                                 {#if entry.clue?.city}
-                                    * {entry.clue.city}
+                                    <span
+                                        class="clue"
+                                        title="This entry has a clue that suggests the city is {entry
+                                            .clue.city}"
+                                    >
+                                        * {entry.clue.city}
+                                    </span>
                                 {:else if entry.clue?.code}
-                                    * {entry.clue.code}
+                                    <span
+                                        class="clue"
+                                        title="This entry has a clue that suggests the nearest airport has IATA airport code {entry
+                                            .clue.code}"
+                                    >
+                                        * {entry.clue.code}
+                                    </span>
                                 {/if}
                             </td>
                         </tr>
@@ -58,5 +70,10 @@
         min-width: 20em;
         display: flex;
         flex-direction: column;
+    }
+
+    .clue {
+        white-space: nowrap;
+        user-select: none;
     }
 </style>

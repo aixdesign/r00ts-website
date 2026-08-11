@@ -65,7 +65,12 @@
                         {dataState.networks[netId]?.organisation_name}
                         <!-- {dataState.networks[netId].network_name} -->
                         {#if !dataState.networksDatacenters[netId]}
-                            [!]
+                            <span
+                                class="empty"
+                                title="No datacenters found for this network!"
+                            >
+                                [!]
+                            </span>
                         {/if}
                     {/if}
                 </span>
@@ -136,5 +141,9 @@
     .selected,
     .entry:hover {
         background: #edff00;
+    }
+
+    .empty {
+        user-select: none;
     }
 </style>
