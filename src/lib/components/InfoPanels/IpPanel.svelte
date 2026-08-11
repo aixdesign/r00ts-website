@@ -4,6 +4,7 @@
     import { padIp } from "$lib/ip_utils";
 
     import IpDetailsPanel from "./IpDetailsPanel.svelte";
+    import HoverTip from "../HoverTip.svelte";
 
     let selectedNetId: number | null = $state(null);
 
@@ -65,12 +66,11 @@
                         {dataState.networks[netId]?.organisation_name}
                         <!-- {dataState.networks[netId].network_name} -->
                         {#if !dataState.networksDatacenters[netId]}
-                            <span
-                                class="empty"
-                                title="No datacenters found for this network!"
+                            <HoverTip
+                                text="No datacenters found for this network!"
                             >
                                 [!]
-                            </span>
+                            </HoverTip>
                         {/if}
                     {/if}
                 </span>
@@ -141,9 +141,5 @@
     .selected,
     .entry:hover {
         background: #edff00;
-    }
-
-    .empty {
-        user-select: none;
     }
 </style>

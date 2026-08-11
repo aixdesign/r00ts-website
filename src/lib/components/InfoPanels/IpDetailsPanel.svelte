@@ -1,5 +1,6 @@
 <script lang="ts">
     import type { Entry } from "$lib/types";
+    import HoverTip from "../HoverTip.svelte";
 
     interface Props {
         entryElement: HTMLDivElement | null;
@@ -26,15 +27,14 @@
                                     <span>[{entry.durationMs}ms]</span>
                                 {/if}
                             </td>
-                            <td>
+                            <td class="clue">
                                 {#if entry.clue?.city}
-                                    <span
-                                        class="clue"
-                                        title="This entry has a clue that suggests the city is {entry
+                                    <HoverTip
+                                        text="This entry has a clue that suggests the city is {entry
                                             .clue.city}"
                                     >
                                         * {entry.clue.city}
-                                    </span>
+                                    </HoverTip>
                                 {:else if entry.clue?.code}
                                     <span
                                         class="clue"
