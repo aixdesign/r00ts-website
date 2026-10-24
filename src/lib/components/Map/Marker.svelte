@@ -4,7 +4,7 @@
 
     import type { Datacenter, Network, Weather } from "$lib/types";
 
-    import maplibregl from "maplibre-gl";
+    import { Marker } from "maplibre-gl";
     import WeatherComponent from "./WeatherComponent.svelte";
     import { markerState, selectDatacenter } from "./marker.svelte";
 
@@ -23,7 +23,7 @@
 
     $effect(() => {
         const marker = untrack(() => {
-            return new maplibregl.Marker({ element: el })
+            return new Marker({ element: el })
                 .setLngLat([datacenter.lon, datacenter.lat])
                 .addTo(map);
         });

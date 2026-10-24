@@ -1,7 +1,7 @@
 import { mount } from "svelte";
 
 import Sticker from "./Sticker.svelte";
-import maplibregl from "maplibre-gl";
+import { Marker } from "maplibre-gl";
 import { showLocation } from "./locationMarker.svelte";
 
 export const stickerMap: Record<string, string> = {
@@ -44,7 +44,7 @@ export function addSticker(map: maplibregl.Map, lngLat: maplibregl.LngLatLike, m
         },
     });
 
-    const emojiMarker = new maplibregl.Marker({ element: el, draggable: true })
+    const emojiMarker = new Marker({ element: el, draggable: true })
         .setLngLat(lngLat)
         .addTo(map);
 

@@ -3,8 +3,8 @@
 
     import Button from "../Button.svelte";
 
-    import maplibregl from "maplibre-gl";
     import "maplibre-gl/dist/maplibre-gl.css";
+    import { LngLatBounds, Map, Point } from "maplibre-gl";
 
     import { syncMaps } from "./utils.ts";
 
@@ -74,7 +74,7 @@
 
     // svelte-ignore state_referenced_locally
     let zoomState = $state({ value: zoom });
-    let bounds: maplibregl.LngLatBounds = $state(new maplibregl.LngLatBounds());
+    let bounds: maplibregl.LngLatBounds = $state(new LngLatBounds());
 
     let rasteriser = $state<MapRaseriser | null>(null);
 
@@ -83,7 +83,7 @@
 
         const bounds = datacenters.reduce((bounds, dc) => {
             return bounds.extend([dc.lon, dc.lat]);
-        }, new maplibregl.LngLatBounds());
+        }, new LngLatBounds());
 
         markerState.datacenter = null;
 
@@ -110,7 +110,7 @@
     $effect(() => {
         if (!markerState.highlighted.length || !map) return;
 
-        const bounds = new maplibregl.LngLatBounds();
+        const bounds = new LngLatBounds();
         datacenters?.forEach((dc) => {
             if (markerState.highlighted.includes(dc.id))
                 bounds.extend([dc.lon, dc.lat]);
@@ -123,7 +123,7 @@
     });
 
     onMount(() => {
-        map = new maplibregl.Map({
+        map = new Map({
             container: mapContainer,
             style: resolve("/") + "osm_surface.json",
             center,
@@ -137,7 +137,7 @@
             canvasContextAttributes: { preserveDrawingBuffer: true },
         });
 
-        mapBuildingsLayer = new maplibregl.Map({
+        mapBuildingsLayer = new Map({
             container: mapBuildingsContainer,
             style: resolve("/") + "osm_buildings.json",
             center,
@@ -255,7 +255,7 @@
         const data = e.dataTransfer?.getData("text/plain");
 
         const mapRect = mapContainer.getBoundingClientRect();
-        const point = new maplibregl.Point(
+        const point = new Point(
             e.clientX - mapRect.left,
             e.clientY - mapRect.top,
         );

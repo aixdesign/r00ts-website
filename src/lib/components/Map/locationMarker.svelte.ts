@@ -1,4 +1,4 @@
-import maplibregl from "maplibre-gl";
+import { Map } from "maplibre-gl";
 import { unmount } from "svelte";
 import { addSticker, stickerState } from "./sticker.svelte";
 
@@ -7,7 +7,7 @@ let component: { $set?: any, $get?: any };
 
 export let showLocation = $state({ value: false });
 
-function success(map: maplibregl.Map, position: GeolocationPosition) {
+function success(map: Map, position: GeolocationPosition) {
     stickerState.loading = false;
     if (!stickerState.locationMarker) {
         const sticker = addSticker(map, [
@@ -38,7 +38,7 @@ function error(error: GeolocationPositionError) {
     );
 }
 
-export function getUserLocation(map: maplibregl.Map) {
+export function getUserLocation(map: Map) {
     if (!showLocation.value) {
         showLocation.value = true;
         watchId = window.navigator.geolocation.watchPosition(
