@@ -1,6 +1,6 @@
-import { json, error } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 
-import * as database from '$lib/server/database.js';
+import * as database from '#lib/server/database.js';
 
 export async function GET({ url }) {
     const search_note_id = url.searchParams.get('id');
@@ -15,7 +15,7 @@ export async function GET({ url }) {
         datacenter_id = parseInt(search_datacenter_id);
 
     const result = database.getNotes(note_id, datacenter_id);
-    return json(result);
+    return Response.json(result);
 };
 
 export async function POST({ request }) {
@@ -23,7 +23,7 @@ export async function POST({ request }) {
 
     const result = database.addNote(type, title, url, body, datacenter_id);
     if (result.success)
-        return json(result);
+        return Response.json(result);
     else
         return error(result.code, result.reason);
 };

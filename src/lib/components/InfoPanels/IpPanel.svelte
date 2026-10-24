@@ -1,7 +1,7 @@
 <script lang="ts">
     import { markerState } from "../Map/marker.svelte";
-    import { dataState } from "$lib/components/InfoPanels/data.svelte.js";
-    import { padIp } from "$lib/ip_utils";
+    import { dataState } from "#lib/components/InfoPanels/data.svelte.js";
+    import { padIp } from "#lib/ip_utils.js";
 
     import IpDetailsPanel from "./IpDetailsPanel.svelte";
     import HoverTip from "../HoverTip.svelte";

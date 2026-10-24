@@ -1,7 +1,7 @@
 <script lang="ts">
     import Icon from "@iconify/svelte";
 
-    import type { Weather } from "$lib/types";
+    import type { Weather } from "#lib/types.js";
 
     let { weather }: { weather: Weather | null } = $props();
 

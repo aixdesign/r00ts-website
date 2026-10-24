@@ -1,13 +1,14 @@
 <script lang="ts">
-    import type { Datacenter, Network } from "$lib/types";
+    import type { Datacenter, Network } from "#lib/types.js";
+    import type { Map } from "maplibre-gl";
     import { dataState } from "./data.svelte";
     import { markerState } from "../Map/marker.svelte";
     import Tooltip from "./Tooltip.svelte";
-    import { padIp } from "$lib/ip_utils";
+    import { padIp } from "#lib/ip_utils.js";
     import { onDestroy, onMount } from "svelte";
 
     interface Props {
-        map: maplibregl.Map | null;
+        map: Map | null;
         datacenter: Datacenter;
     }
 

@@ -3,10 +3,21 @@ import path from 'path';
 import { migrate } from '@blackglory/better-sqlite3-migrations';
 import Database from 'better-sqlite3';
 
-import type { City, Datacenter, Entry, EntryRow, Facility, IpBlock, Network, Note, PostResult, Session } from '$lib/types';
-import { NoteType } from '$lib/types';
+import type {
+    City,
+    Datacenter,
+    Entry,
+    EntryRow,
+    Facility,
+    IpBlock,
+    Network,
+    Note,
+    PostResult,
+    Session
+} from '#lib/types.js';
 
-import { NETWORKSDB_API } from '$env/static/private';
+import { NoteType } from '#lib/types.js';
+import { NETWORKSDB_API } from '$app/env/private';
 import { CONTINENT_COUNTRY_LIST } from './countries';
 
 if (!NETWORKSDB_API)
@@ -19,7 +30,7 @@ else
 const db = new Database('r00ts.db');
 db.pragma('journal_mode = WAL');
 
-import { intToIP, IPtoInt } from '$lib/ip_utils';
+import { intToIP, IPtoInt } from '#lib/ip_utils.js';
 import { findMigrationFilenames, readMigrationFile } from 'migration-files';
 import { fetchSatilliteView } from './mapbox_fetch';
 import { getFacilitiesFromASN, getPeeringDBNetwork } from './peeringdb';
@@ -33,7 +44,7 @@ migrate(db, migrations);
 function tableInsert(table: string, parameters: Record<string, any>, on_conflict?: string) {
     const keys = Object.keys(parameters);
     const values = Object.values(parameters);
-    const placeholder = keys.map(_ => "?").join(',');
+    const placeholder = keys.map((_) => "?").join(',');
     const conflict_clause = on_conflict ? `ON CONFLICT ${on_conflict}` : '';
     const statement = `INSERT INTO ${table}(${keys.join(',')}) VALUES(${placeholder}) ${conflict_clause}`;
     return db.prepare(statement).run(values);
@@ -96,8 +107,12 @@ export function addNote(type: NoteType, title?: string, url?: string, body?: str
     return { success: true, code: 201 };
 }
 
-export async function getNetwork(ip: number | string)
-    : Promise<{ success: boolean, reason?: string, network?: Network, datacenter_ids?: number[] }> {
+export async function getNetwork(ip: number | string): Promise<{ 
+    success: boolean;
+    reason?: string;
+    network?: Network;
+    datacenter_ids?: number[]
+ }> {
     let ip_int: number;
     let ip_str: string;
 
@@ -138,15 +153,9 @@ export async function getNetwork(ip: number | string)
     }
 
     const params = new URLSearchParams({ ip: ip_str });
-    const data = await fetch(`https://networksdb.io/api/ip-info?${params}`, {
-        method: 'GET',
-        headers: {
-            'X-Api-Key': NETWORKSDB_API
-        }
-    })
-        .then(res => res.json())
-        .catch(err => {
-            console.log('Error fetching from networksdb');
+
+    const data = await fetch(`https://networksdb.io/api/ip-info?${params}`, { method: 'GET', headers: { 'X-Api-Key': NETWORKSDB_API } }).then((res) => res.json()).catch((err) => {
+        console.log('Error fetching from networksdb');
             console.error(err)
         })
 
@@ -190,12 +199,9 @@ export async function getNetwork(ip: number | string)
         };
 
         const result = tableInsert('Networks', network_params);
-        network_id = result.lastInsertRowid as number;
 
-        network_asn = {
-            id: network_id,
-            ...network_params
-        };
+        network_id = result.lastInsertRowid as number;
+        network_asn = { id: network_id, ...network_params };
     }
 
     // Create IpBlocks entry
@@ -286,12 +292,8 @@ function iterativeSearch(asn: number, country_code?: string, city?: string): Dat
     console.log(" - 1 Initial search...");
     let facilities = db.prepare(facility_query.join(' ')).all(facility_query_params) as Datacenter[];
 
-    if (city && facilities.length > 0)
-        console.log('  Found results that matched city!');
-
-    if (facilities && facilities.length > 0)
-        return facilities;
-
+    if (city && facilities.length > 0) console.log('  Found results that matched city!');
+    if (facilities && facilities.length > 0) return facilities;
 
     if (city && country_code) {
         // Drop city search
@@ -312,7 +314,7 @@ function iterativeSearch(asn: number, country_code?: string, city?: string): Dat
 
     // If country code, broaden search to include continent...
     const neighbours = getNeighbours(country_code);
-    const placeholders = neighbours.map(_ => "?").join(',');
+    const placeholders = neighbours.map((_) => "?").join(',');
     const neighbour_clause = `AND d.country_code IN (${placeholders})`;
     facility_query = [select_clause, neighbour_clause];
     facility_query_params = [asn, ...neighbours];
@@ -330,11 +332,8 @@ function iterativeSearch(asn: number, country_code?: string, city?: string): Dat
     return facilities;
 }
 
-export async function getDatacenters(asn: number, country_code?: string, city?: string)
-    : Promise<{ success: boolean, reason?: string, facilities?: Datacenter[] }> {
-
-    if (!asn)
-        return { success: false, reason: 'ASN not provided' };
+export async function getDatacenters(asn: number, country_code?: string, city?: string): Promise<{ success: boolean; reason?: string; facilities?: Datacenter[] }> {
+    if (!asn) return { success: false, reason: 'ASN not provided' };
 
     let net = db.prepare('SELECT * FROM Networks WHERE asn = ?').get([asn]) as Network;
 
@@ -345,7 +344,7 @@ export async function getDatacenters(asn: number, country_code?: string, city?: 
 
     // Only search if database is up to date
     const now = Math.floor(Date.now() / 1000);
-    if (net.last_update >= now - (7 * 24 * 60 * 60)) {
+    if (net.last_update >= now - 7 * 24 * 60 * 60) {
         facilities = iterativeSearch(asn, country_code, city);
         console.log(`Found ${facilities.length} facilities`);
 
@@ -384,17 +383,7 @@ export async function getDatacenters(asn: number, country_code?: string, city?: 
 
             const cityRow = db.prepare('SELECT * FROM Cities WHERE name LIKE ? AND country_code LIKE ?').get(fac.city, fac.country) as City;
             if (!cityRow) {
-                const cityData = await fetch(
-                    `https://nominatim.openstreetmap.org/search?q=${fac.city}&countrycodes=${fac.country}&format=jsonv2&limit=1`,
-                    {
-                        headers: {
-                            'User-Agent': "DatacenterMap/1.0"
-                        }
-                    }
-
-                )
-                    .then(res => res.json())
-                    .catch(console.error);
+                const cityData = await fetch(`https://nominatim.openstreetmap.org/search?q=${fac.city}&countrycodes=${fac.country}&format=jsonv2&limit=1`, { headers: { 'User-Agent': "DatacenterMap/1.0" } }).then((res) => res.json()).catch(console.error);
 
                 if (!cityData) {
                     console.error(`No city data found for ${fac.city} ${fac.country}`);
@@ -433,7 +422,7 @@ export function getNetworksFromIds(ids: number[]) {
     if (!ids || ids == undefined || !ids.length)
         return [];
 
-    const placeholder = ids.map(_ => "?").join(',');
+    const placeholder = ids.map((_) => "?").join(',');
     return db.prepare(`SELECT * FROM Networks WHERE id IN (${placeholder})`).all(ids) as Network[];
 }
 
@@ -442,7 +431,7 @@ export function getAllDatacenters(): Datacenter[] {
 }
 
 export function getDatacentersFromIds(ids: number[]): Datacenter[] {
-    const placeholder = ids.map(_ => "?").join(',');
+    const placeholder = ids.map((_) => "?").join(',');
     const datacenters = db.prepare(`SELECT * FROM Datacenters WHERE id IN (${placeholder})`).all(ids) as Datacenter[];
 
     let count = 0;
@@ -451,9 +440,8 @@ export function getDatacentersFromIds(ids: number[]): Datacenter[] {
             continue;
 
         //console.log('getDatacentersFromIds dc.filename is undefined, fetching aerial view...');
-        fetchSatilliteView(dc.lon, dc.lat).then(res => {
-            if (!res.success || !res.filename)
-                return;
+        fetchSatilliteView(dc.lon, dc.lat).then((res) => {
+            if (!res.success || !res.filename) return;
 
             updateDatacenterFilename(dc.id, res.filename);
         });
@@ -471,19 +459,16 @@ export function getDatacentersFromIds(ids: number[]): Datacenter[] {
 export function getNetworksDatacenters(network_ids: number[], datacenter_ids: number[]) {
     const result: Record<number, number[]> = {};
 
-    const network_placeholder = network_ids.map(_ => "?").join(',');
-    const datacenter_placeholder = datacenter_ids.map(_ => "?").join(',');
+    const network_placeholder = network_ids.map((_) => "?").join(',');
+    const datacenter_placeholder = datacenter_ids.map((_) => "?").join(',');
 
     const rows = db.prepare(`
         SELECT * FROM NetworksDatacenters 
         WHERE network_id IN ( ${network_placeholder} ) AND datacenter_id IN ( ${datacenter_placeholder} )
-    `).all(...network_ids, ...datacenter_ids) as { network_id: number, datacenter_id: number }[];
+    `).all(...network_ids, ...datacenter_ids) as { network_id: number; datacenter_id: number }[];
 
-    rows.forEach(el => {
-        if (result[el.network_id] != undefined)
-            result[el.network_id].push(el.datacenter_id);
-        else
-            result[el.network_id] = [el.datacenter_id];
+    rows.forEach((el) => {
+        if (result[el.network_id] != undefined) result[el.network_id].push(el.datacenter_id); else result[el.network_id] = [el.datacenter_id];
     });
 
     return result;
@@ -503,9 +488,9 @@ export async function getDatacenterAerialImage(id: number): Promise<string | nul
             return null;
 
         updateDatacenterFilename(id, res.filename);
-        return res.filename;
 
-    } catch (err) {
+        return res.filename;
+    } catch(err) {
         console.error(`Error fetching coordinates of ${id}`);
         console.error(err);
         return null;
@@ -567,7 +552,7 @@ export function getSession(hostname: string) {
     const entry_rows = db.prepare(session_select).all(session_row.id) as EntryRow[];
 
     const datacenter_rows = db.prepare("SELECT datacenter_id FROM SessionsDatacenters WHERE session_id = ?").all(session_row.id) as { datacenter_id: number }[];
-    const datacenter_ids = datacenter_rows.map(e => e.datacenter_id);
+    const datacenter_ids = datacenter_rows.map((e) => e.datacenter_id);
 
     const datacenters = getDatacentersFromIds(datacenter_ids);
 
@@ -581,7 +566,7 @@ export function searchSessions(hostname: string) {
     const select_clause = `SELECT hostname FROM Sessions WHERE hostname LIKE ? ORDER BY submitted DESC LIMIT 10`;
     const result = db.prepare(select_clause).all(`%${hostname}%`) as { hostname: string }[];
 
-    const suggestions = result.map(e => e.hostname);
+    const suggestions = result.map((e) => e.hostname);
 
     return suggestions;
 }

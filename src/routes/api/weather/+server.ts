@@ -1,6 +1,6 @@
-import { json, error } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 
-import type { Weather } from '$lib/types.js';
+import type { Weather } from '#lib/types.js';
 
 import { fetchWeatherApi } from 'openmeteo';
 
@@ -43,7 +43,7 @@ export async function POST({ request }) {
                     weatherCode
                 };
 
-            return json({
+            return Response.json({
                 time: now,
                 weatherCode,
                 temperature
@@ -59,7 +59,7 @@ export async function POST({ request }) {
     } else {
         //console.log(`weatherCache hit for id ${id}`);
 
-        return json(weatherCache[id]);
+        return Response.json(weatherCache[id]);
     }
 
 }

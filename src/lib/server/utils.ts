@@ -1,5 +1,5 @@
-import { ipCompareFn, isIPv4 } from "$lib/ip_utils";
-import type { Entry } from "$lib/types";
+import { ipCompareFn, isIPv4 } from "#lib/ip_utils.js";
+import type { Entry } from "#lib/types.js";
 
 import psl from 'psl';
 

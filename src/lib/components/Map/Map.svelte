@@ -4,11 +4,21 @@
     import Button from "../Button.svelte";
 
     import "maplibre-gl/dist/maplibre-gl.css";
-    import { LngLatBounds, Map, Point } from "maplibre-gl";
+    import {
+        GeoJSONSource,
+        LngLat,
+        LngLatBounds,
+        Map,
+        Point,
+        setWorkerUrl,
+    } from "maplibre-gl";
+    // MapLibre v6 locates its worker relative to its own module URL, which
+    // breaks once Vite bundles it, so point it at the emitted worker file.
+    import maplibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url";
 
     import { syncMaps } from "./utils.ts";
 
-    import type { Datacenter } from "$lib/types";
+    import type { Datacenter } from "#lib/types.js";
     import DebugPanel from "./DebugPanel.svelte";
     import { MapRaseriser } from "./glyphRenderer.ts";
     import { glyphSize } from "./glyphState.svelte.ts";
@@ -32,12 +42,14 @@
     } from "./clusterMarkers.ts";
     import DataPanel from "../InfoPanels/DataPanel.svelte";
     import AudioButton from "../AudioButton.svelte";
-    import { resolve } from "$app/paths";
+    import { asset } from "$app/paths";
+
+    setWorkerUrl(maplibreWorkerUrl);
 
     let mapContainer: HTMLDivElement;
     let mapBuildingsContainer: HTMLDivElement;
-    let map: maplibregl.Map | null = $state.raw(null);
-    let mapBuildingsLayer: maplibregl.Map | null = $state.raw(null);
+    let map: Map | null = $state.raw(null);
+    let mapBuildingsLayer: Map | null = $state.raw(null);
 
     let mapCanvas: HTMLCanvasElement;
     let glyphOverlayCanvas: HTMLCanvasElement;
@@ -74,7 +86,7 @@
 
     // svelte-ignore state_referenced_locally
     let zoomState = $state({ value: zoom });
-    let bounds: maplibregl.LngLatBounds = $state(new LngLatBounds());
+    let bounds: LngLatBounds = $state(new LngLatBounds());
 
     let rasteriser = $state<MapRaseriser | null>(null);
 
@@ -102,7 +114,7 @@
     $effect(() => {
         datacenters;
         const source = mapBuildingsLayer?.getSource("datacenters") as
-            | maplibregl.GeoJSONSource
+            | GeoJSONSource
             | undefined;
         if (source && datacenters) source.setData(toGeoJSON(datacenters));
     });
@@ -125,7 +137,7 @@
     onMount(() => {
         map = new Map({
             container: mapContainer,
-            style: resolve("/") + "osm_surface.json",
+            style: asset("osm_surface.json"),
             center,
             zoom,
             interactive: false,
@@ -139,7 +151,7 @@
 
         mapBuildingsLayer = new Map({
             container: mapBuildingsContainer,
-            style: resolve("/") + "osm_buildings.json",
+            style: asset("osm_buildings.json"),
             center,
             zoom,
             interactive: true,
@@ -264,7 +276,7 @@
         onMarkerDropped(lngLat, data);
     }
 
-    function onMarkerDropped(point: maplibregl.LngLat, data?: string) {
+    function onMarkerDropped(point: LngLat, data?: string) {
         if (!map) return;
 
         const sticker = addSticker(map, point, data);

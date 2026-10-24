@@ -14,14 +14,12 @@
         markerState.highlighted = [];
         markerState.preview = [];
 
-        fetch(resolve("/api/datacenter"))
-            .then((res) => res.json())
-            .then((data) => {
-                dataState.datacenters = data.datacenters;
+        fetch(resolve('api/datacenter')).then((res) => res.json()).then((data) => {
+            dataState.datacenters = data.datacenters;
             })
             .catch((err) => {
-                console.error(err);
-            });
+            console.error(err);
+        });
     }
 </script>
 
@@ -29,7 +27,7 @@
     {#if dataState.pageUrl}
         <div class="url">{dataState.pageUrl}</div>
     {/if}
-    <button {onclick}>Exit session</button>
+    <button onclick={onclick}>Exit session</button>
 </div>
 
 <style>

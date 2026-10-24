@@ -1,11 +1,14 @@
-import type { Datacenter } from "$lib/types";
+import type { FeatureCollection } from "geojson";
+import type { GeoJSONSource, Map } from "maplibre-gl";
+
+import type { Datacenter } from "#lib/types.js";
 import { selectDatacenter } from "./marker.svelte";
 
 export const CLUSTER_MAX_ZOOM = 10;
 
 let datacenters: Datacenter[];
 
-export function addClusterSource(map: maplibregl.Map, dcs: Datacenter[]) {
+export function addClusterSource(map: Map, dcs: Datacenter[]) {
     const fill = "#ff70b3";
     map.addImage("cluster-square-sm", createSquareImage(24, fill));
     map.addImage("cluster-square-md", createSquareImage(32, fill));
@@ -60,7 +63,7 @@ export function addClusterSource(map: maplibregl.Map, dcs: Datacenter[]) {
     map.on("click", "clusters", async (e) => {
         const features = map.queryRenderedFeatures(e.point, { layers: ["clusters"] });
         const clusterId = features[0].properties!.cluster_id;
-        const source = map.getSource("datacenters") as maplibregl.GeoJSONSource;
+        const source = map.getSource("datacenters") as GeoJSONSource;
         const zoom = await source.getClusterExpansionZoom(clusterId);
         map.easeTo({ center: (features[0].geometry as any).coordinates, zoom });
     });
@@ -87,7 +90,7 @@ export function addClusterSource(map: maplibregl.Map, dcs: Datacenter[]) {
     });
 }
 
-export function toGeoJSON(dcs: Datacenter[]): GeoJSON.FeatureCollection {
+export function toGeoJSON(dcs: Datacenter[]): FeatureCollection {
     datacenters = dcs;
     return {
         type: "FeatureCollection",

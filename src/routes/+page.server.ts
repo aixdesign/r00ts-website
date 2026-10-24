@@ -1,6 +1,6 @@
-import { getAllDatacenters, getDatacentersFromIds, getNetworksFromIds } from "$lib/server/database.js";
-import { getNetworkIps } from "$lib/server/utils";
-import type { Datacenter, Network, Entry } from "$lib/types";
+import { getAllDatacenters, getDatacentersFromIds, getNetworksFromIds } from "#lib/server/database.js";
+import { getNetworkIps } from "#lib/server/utils.js";
+import type { Datacenter, Network, Entry } from "#lib/types.js";
 
 export async function load({ url }) {
     const showDebug: boolean = url.searchParams.get('debug') ? true : false;

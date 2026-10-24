@@ -1,7 +1,7 @@
 import { mount } from "svelte";
 
 import Sticker from "./Sticker.svelte";
-import { Marker } from "maplibre-gl";
+import { Marker, type LngLatLike, type Map } from "maplibre-gl";
 import { showLocation } from "./locationMarker.svelte";
 
 export const stickerMap: Record<string, string> = {
@@ -20,11 +20,11 @@ const random = Object.keys(stickerMap)[Math.floor(Math.random() * Object.keys(st
 export let stickerState: {
     avaliable: string,
     placed: boolean,
-    locationMarker: maplibregl.Marker | null,
+    locationMarker: Marker | null,
     loading: boolean
 } = $state({ avaliable: random, placed: false, locationMarker: null, loading: false });
 
-export function addSticker(map: maplibregl.Map, lngLat: maplibregl.LngLatLike, markerName: string = "bug") {
+export function addSticker(map: Map, lngLat: LngLatLike, markerName: string = "bug") {
     let emoji = stickerMap[markerName];
 
     function onclick() {

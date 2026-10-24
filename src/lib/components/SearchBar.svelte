@@ -17,7 +17,7 @@
     let autocompleteTimeout: NodeJS.Timeout | null = $state(null);
     let autocompleteEntries: string[] = $state([]);
 
-    const sessionUrl = resolve("/api/session");
+    const sessionUrl = resolve('api/session');
 
     function onsubmit() {
         const params = new URLSearchParams({ query });
@@ -26,24 +26,24 @@
         fetch(`${sessionUrl}?${params.toString()}`)
             .then((res) => res.json())
             .then((data) => {
-                if (!data.entries) {
-                    noResults = true;
-                    return;
-                }
+            if (!data.entries) {
+                noResults = true;
+                return;
+            }
 
-                dataState.isSearchResults = true;
-                dataState.entries = data.entries;
-                dataState.networks = data.networks;
-                dataState.pageUrl = data.pageUrl;
-                dataState.datacenters = data.datacenters;
-                dataState.networkIps = data.networkIps;
-                dataState.networksDatacenters = data.networksDatacenters;
+            dataState.isSearchResults = true;
+            dataState.entries = data.entries;
+            dataState.networks = data.networks;
+            dataState.pageUrl = data.pageUrl;
+            dataState.datacenters = data.datacenters;
+            dataState.networkIps = data.networkIps;
+            dataState.networksDatacenters = data.networksDatacenters;
 
-                fitAll(true);
+            fitAll(true);
             })
             .catch(() => {
-                noResults = true;
-            });
+            noResults = true;
+        });
     }
 
     function oninput() {
@@ -98,12 +98,12 @@
     <input
         bind:value={query}
         placeholder="Search user submitted URLs"
-        {onkeyup}
-        {oninput}
+        onkeyup={onkeyup}
+        oninput={oninput}
         onfocusin={() => {
             if (!autocompleteEntries.length) showHelp = true;
         }}
-        onfocusout={() => (showHelp = false)}
+        onfocusout={() => showHelp = false}
         bind:focused={hasFocus}
     />
     {#if noResults}

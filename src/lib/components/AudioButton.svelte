@@ -1,13 +1,12 @@
 <script lang="ts">
-    import { resolve } from "$app/paths";
+    import { asset } from "$app/paths";
     import Button from "./Button.svelte";
 
     import Icon from "@iconify/svelte";
 
     let isPlaying = $state(false);
 
-    const root = resolve("/");
-    const tracks = [`${root}SustainSJ_Rec1.mp3`, `${root}SustainSJ_Rec2.mp3`];
+    const tracks = [asset("SustainSJ_Rec1.mp3"), asset("SustainSJ_Rec2.mp3")];
     let track_id = 0;
 
     let audioFile: HTMLAudioElement;

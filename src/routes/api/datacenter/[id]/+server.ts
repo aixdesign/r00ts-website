@@ -1,6 +1,6 @@
-import { json, error } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 
-import { getDatacenter } from '$lib/server/database';
+import { getDatacenter } from '#lib/server/database.js';
 
 export async function GET({ params }) {
     const { id } = params;
@@ -13,5 +13,5 @@ export async function GET({ params }) {
 
     const { datacenter, networks } = await getDatacenter(parseInt(id));
 
-    return json({ datacenter, networks });
+    return Response.json({ datacenter, networks });
 }

@@ -4,7 +4,7 @@ import { join } from 'path';
 import { lookup } from 'mime-types';
 import type { RequestHandler } from './$types';
 
-import { AERIAL_DIR } from '$env/static/private';
+import { AERIAL_DIR } from '$app/env/private';
 
 let IMAGE_DIR = AERIAL_DIR || 'images/aerial';
 
