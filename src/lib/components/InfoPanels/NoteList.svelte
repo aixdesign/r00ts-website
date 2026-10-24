@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { NoteType } from "$lib/types";
+    import { NoteType } from "#lib/types.js";
     let { notes } = $props();
 </script>
 

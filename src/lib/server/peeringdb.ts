@@ -1,6 +1,6 @@
 import Database from 'better-sqlite3';
 
-import type { Facility, PeeringNetwork } from '$lib/types';
+import type { Facility, PeeringNetwork } from '#lib/types.js';
 
 const peeringdb = new Database('peeringdb.sqlite3');
 

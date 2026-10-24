@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { Entry } from "$lib/types";
+    import type { Entry } from "#lib/types.js";
     import HoverTip from "../HoverTip.svelte";
 
     interface Props {

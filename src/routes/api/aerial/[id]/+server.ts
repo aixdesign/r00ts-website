@@ -1,5 +1,5 @@
-import { getDatacenterAerialImage } from '$lib/server/database.js';
-import { json, error } from '@sveltejs/kit'
+import { getDatacenterAerialImage } from '#lib/server/database.js';
+import { error } from '@sveltejs/kit';
 
 export async function GET({ params }) {
     const { id } = params;
@@ -15,7 +15,7 @@ export async function GET({ params }) {
     const result = await getDatacenterAerialImage(parseInt(id));
 
     if (result)
-        return json({ filename: result });
+        return Response.json({ filename: result });
     else
         return error(400);
 

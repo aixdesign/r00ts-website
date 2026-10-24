@@ -1,7 +1,7 @@
-import { json, error } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 
-import { getNetwork, getDatacenters } from '$lib/server/database';
-import { isIpReserved, IPtoInt, isIPv4 } from '$lib/ip_utils.js';
+import { getNetwork, getDatacenters } from '#lib/server/database.js';
+import { isIpReserved, IPtoInt, isIPv4 } from '#lib/ip_utils.js';
 
 export async function GET({ params, url, getClientAddress }) {
     const { ip } = params;
@@ -18,7 +18,7 @@ export async function GET({ params, url, getClientAddress }) {
 
     const ip_int = IPtoInt(ip);
     if (isIpReserved(ip_int))
-        return json({ reserved: true });
+        return Response.json({ reserved: true });
 
     const networkRequest = await getNetwork(ip_int);
     if (!networkRequest.success)
@@ -57,5 +57,5 @@ export async function GET({ params, url, getClientAddress }) {
     if (!facilitiesRequest.facilities)
         error(500, facilitiesRequest.reason);
 
-    return json({ facilities: facilitiesRequest.facilities, network: networkRequest.network, user });
+    return Response.json({ facilities: facilitiesRequest.facilities, network: networkRequest.network, user });
 }

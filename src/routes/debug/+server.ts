@@ -1,7 +1,5 @@
-import { json } from '@sveltejs/kit';
-
 export function GET({ request, getClientAddress }) {
-    return json({
+    return Response.json({
         clientAddress: getClientAddress(),
         headers: Object.fromEntries(request.headers)
     });

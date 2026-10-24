@@ -1,16 +1,16 @@
 <script lang="ts">
     import { onMount } from "svelte";
 
-    import Map from "$lib/components/Map/Map.svelte";
+    import Map from "#lib/components/Map/Map.svelte";
 
-    import AboutPanel from "$lib/components/InfoPanels/AboutPanel.svelte";
-    import IpPanel from "$lib/components/InfoPanels/IpPanel.svelte";
-    import SearchBar from "$lib/components/SearchBar.svelte";
-    import SessionPanel from "$lib/components/InfoPanels/SessionPanel.svelte";
-    import SummaryPanel from "$lib/components/InfoPanels/SummaryPanel.svelte";
+    import AboutPanel from "#lib/components/InfoPanels/AboutPanel.svelte";
+    import IpPanel from "#lib/components/InfoPanels/IpPanel.svelte";
+    import SearchBar from "#lib/components/SearchBar.svelte";
+    import SessionPanel from "#lib/components/InfoPanels/SessionPanel.svelte";
+    import SummaryPanel from "#lib/components/InfoPanels/SummaryPanel.svelte";
 
-    import { dataState } from "$lib/components/InfoPanels/data.svelte.js";
-    import { markerState } from "$lib/components/Map/marker.svelte.js";
+    import { dataState } from "#lib/components/InfoPanels/data.svelte.js";
+    import { markerState } from "#lib/components/Map/marker.svelte.js";
 
     const { data } = $props();
 

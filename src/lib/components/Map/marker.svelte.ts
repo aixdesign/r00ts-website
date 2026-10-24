@@ -1,4 +1,6 @@
-import type { Datacenter, Network } from "$lib/types";
+import type { Map } from "maplibre-gl";
+
+import type { Datacenter, Network } from "#lib/types.js";
 
 let datacenter: Datacenter | null = $state(null);
 let networks: Network[] = $state.raw([]);
@@ -19,7 +21,7 @@ export const markerState = {
     set largeMarker(v: boolean) { largeMarker = v },
 };
 
-export function selectDatacenter(map: maplibregl.Map, datacenter: Datacenter, animate: boolean = true) {
+export function selectDatacenter(map: Map, datacenter: Datacenter, animate: boolean = true) {
     markerState.datacenter = datacenter;
 
     map.flyTo({

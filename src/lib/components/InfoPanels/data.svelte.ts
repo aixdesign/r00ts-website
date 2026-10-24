@@ -1,4 +1,4 @@
-import type { Network, Entry, Datacenter } from '$lib/types';
+import type { Network, Entry, Datacenter } from '#lib/types.js';
 
 let pageUrl: string = $state('');
 let networks: Record<number, Network> = $state.raw({});

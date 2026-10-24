@@ -2,9 +2,9 @@
     import { resolve } from "$app/paths";
     import { untrack } from "svelte";
 
-    import type { Datacenter, Network, Weather } from "$lib/types";
+    import type { Datacenter, Network, Weather } from "#lib/types.js";
 
-    import maplibregl from "maplibre-gl";
+    import { Marker, type Map } from "maplibre-gl";
     import WeatherComponent from "./WeatherComponent.svelte";
     import { markerState, selectDatacenter } from "./marker.svelte";
 
@@ -12,7 +12,7 @@
         map,
         datacenter,
     }: {
-        map: maplibregl.Map;
+        map: Map;
         datacenter: Datacenter;
     } = $props();
 
@@ -23,7 +23,7 @@
 
     $effect(() => {
         const marker = untrack(() => {
-            return new maplibregl.Marker({ element: el })
+            return new Marker({ element: el })
                 .setLngLat([datacenter.lon, datacenter.lat])
                 .addTo(map);
         });
@@ -32,15 +32,10 @@
     });
 
     let open = $derived(markerState.datacenter?.id == datacenter.id);
-    let highlighted = $derived(
-        markerState.highlighted.includes(datacenter.id) ||
-            markerState.preview.includes(datacenter.id),
-    );
-
-    const aerialAPI = resolve("/api/aerial/");
-    const weatherAPI = resolve("/api/weather");
-
-    const aerial_url: string = resolve("/images/aerial/");
+    let highlighted = $derived(markerState.highlighted.includes(datacenter.id) || markerState.preview.includes(datacenter.id));
+    const aerialAPI = resolve('api/aerial/');
+    const weatherAPI = resolve('api/weather');
+    const aerial_url: string = resolve('images/aerial/');
 
     // svelte-ignore state_referenced_locally
     let aerial_filename = $state(datacenter.filename);
@@ -87,17 +82,16 @@
         if (!fetchedNetworks) {
             fetchedNetworks = true;
             markerState.networks = [];
-            const datacenterURL = resolve("/api/datacenter/");
 
-            fetch(`${datacenterURL}${datacenter.id}`)
-                .then((res) => res.json())
-                .then((data) => {
-                    console.log(data.networks);
-                    markerState.networks = networks = data.networks;
+            const datacenterURL = resolve('api/datacenter/');
+
+            fetch(`${datacenterURL}${datacenter.id}`).then((res) => res.json()).then((data) => {
+                console.log(data.networks);
+                markerState.networks = networks = data.networks;
                 })
                 .catch((err) => {
-                    console.error(err);
-                });
+                console.error(err);
+            });
         } else {
             markerState.networks = networks;
         }
@@ -112,7 +106,7 @@
             class="marker"
             class:marker-small={!markerState.largeMarker}
             class:highlighted
-            {onclick}
+            onclick={onclick}
             role="button"
             tabindex="0"
             aria-label="Datacenter"
@@ -120,7 +114,7 @@
         >
             {#if open && markerState.largeMarker}
                 <div class="title" class:highlighted>
-                    <WeatherComponent {weather} />
+                    <WeatherComponent weather={weather} />
                     <h1>{datacenter.name}</h1>
                 </div>
             {/if}

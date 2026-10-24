@@ -46,7 +46,7 @@
     let submitButton: HTMLButtonElement | undefined = $state();
     let showSubmit = $state(true);
 
-    const submitSessionAPI = resolve("/api/session");
+    const submitSessionAPI = resolve('api/session');
     function submitSession() {
         console.log("submitSession");
         console.log(dataState.pageUrl);
@@ -61,15 +61,14 @@
             body: JSON.stringify({
                 hostname: dataState.pageUrl,
                 entries: dataState.entries,
-                datacenter_ids: dataState.datacenters.map((e) => e.id),
-            }),
-        })
-            .catch((err) => {
-                console.error(err);
+                datacenter_ids: dataState.datacenters.map((e) => e.id)
+            })
+        }).catch((err) => {
+            console.error(err);
             })
             .finally(() => {
-                if (submitButton) {
-                    submitButton.innerText = "Thanks!";
+            if (submitButton) {
+                submitButton.innerText = "Thanks!";
                     setTimeout(() => {
                         showSubmit = false;
                     }, 2000);

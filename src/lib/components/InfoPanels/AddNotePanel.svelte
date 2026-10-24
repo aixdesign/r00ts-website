@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { NoteType } from "$lib/types";
+    import { NoteType } from "#lib/types.js";
     import { resolve } from "$app/paths";
 
     let { id, newNoteAdded } = $props();
@@ -14,7 +14,7 @@
         return false;
     });
 
-    const post_url = resolve("/api/note");
+    const post_url = resolve('api/note');
 
     function toggleForm(e: MouseEvent) {
         e.preventDefault();

@@ -1,7 +1,7 @@
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 
-import { MAPBOX_API, AERIAL_DIR } from '$env/static/private';
+import { MAPBOX_API, AERIAL_DIR } from '$app/env/private';
 
 const MAPBOX_STATIC_URL = "https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static";
 let IMAGE_DIR = AERIAL_DIR || 'images/aerial';
@@ -12,7 +12,7 @@ export async function fetchSatilliteView(
     zoom: number = 16,
     width: number = 350,
     height: number = 350
-): Promise<{ success: boolean, filename?: string, reason?: string }> {
+): Promise<{ success: boolean; filename?: string; reason?: string }> {
 
     if (!MAPBOX_API) {
         console.error("MAPBOX_API not set");

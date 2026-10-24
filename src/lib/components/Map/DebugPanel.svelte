@@ -5,11 +5,12 @@
     import { onMount } from "svelte";
 
     import { markerState, selectDatacenter } from "./marker.svelte.ts";
-    import type { Datacenter } from "$lib/types";
+    import type { Datacenter } from "#lib/types.js";
+    import type { Map, StyleSpecification } from "maplibre-gl";
 
     interface Props {
         rasteriser: MapRaseriser;
-        map: maplibregl.Map;
+        map: Map;
         datacenters?: Datacenter[];
     }
 
@@ -22,7 +23,7 @@
 
     let zoom = $state(2);
 
-    let style: maplibregl.StyleSpecification | null = $state(null);
+    let style: StyleSpecification | null = $state(null);
     let colorValue = $state("white");
 
     onMount(() => {

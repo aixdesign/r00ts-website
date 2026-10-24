@@ -1,10 +1,10 @@
 
-import { json, error } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 
-import * as database from '$lib/server/database.js';
-import { isIPv4 } from '$lib/ip_utils.js';
-import type { Entry } from '$lib/types.js';
-import { getHostname, getNetworkIps } from '$lib/server/utils';
+import * as database from '#lib/server/database.js';
+import { isIPv4 } from '#lib/ip_utils.js';
+import type { Entry } from '#lib/types.js';
+import { getHostname, getNetworkIps } from '#lib/server/utils.js';
 
 export async function GET({ url }) {
     const query = url.searchParams.get('query');
@@ -14,7 +14,7 @@ export async function GET({ url }) {
         const hostname = getHostname(autocomplete);
         const suggestions = database.searchSessions(hostname);
 
-        return json({ suggestions });
+        return Response.json({ suggestions });
     }
 
     if (!query)
@@ -34,7 +34,7 @@ export async function GET({ url }) {
 
         const datacenters = database.getDatacentersFromIds(result.datacenter_ids);
 
-        return json({ pageUrl: query, datacenters, networks: [result.network] });
+        return Response.json({ pageUrl: query, datacenters, networks: [result.network] });
     } else {
         const hostname = getHostname(query);
         if (!hostname)
@@ -61,7 +61,7 @@ export async function GET({ url }) {
 
         const networksDatacenters = database.getNetworksDatacenters(Array.from(network_ids), datacenters.map(el => el.id));
 
-        return json({ pageUrl: hostname, entries, networks, datacenters, networkIps, networksDatacenters });
+        return Response.json({ pageUrl: hostname, entries, networks, datacenters, networkIps, networksDatacenters });
     }
 };
 
@@ -73,5 +73,5 @@ export async function POST({ request }) {
         return error(400, 'Host, datacenter_ids or entry list not submitted');
 
     const result = database.insertSession(hostname, entries, datacenter_ids);
-    return json({ success: result })
+    return Response.json({ success: result })
 };
