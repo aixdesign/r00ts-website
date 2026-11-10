@@ -47,12 +47,13 @@
                 target="_blank"
             >
                 Chrome Web Store
-            </a> ]
-            [ <a
-                href="https://github.com/aixdesign/r00ts-extension/releases"
+            </a>
+            ] [
+            <a
+                href="https://addons.mozilla.org/en-GB/firefox/addon/r00ts/"
                 target="_blank"
             >
-                GitHub (Firefox + manual install)
+                Firefox Add-ons
             </a> ]
         </p>
         <h3>Team</h3>
