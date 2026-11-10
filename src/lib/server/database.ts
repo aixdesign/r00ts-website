@@ -17,7 +17,7 @@ import type {
 } from '#lib/types.js';
 
 import { NoteType } from '#lib/types.js';
-import { NETWORKSDB_API } from '$app/env/private';
+import { NETWORKSDB_API, DB_DIR } from '$app/env/private';
 import { CONTINENT_COUNTRY_LIST } from './countries';
 
 if (!NETWORKSDB_API)
@@ -27,7 +27,7 @@ else
 
 
 // Setup SQLite database connection
-const db = new Database('r00ts.db');
+const db = new Database(path.join(DB_DIR, 'r00ts.db'));
 db.pragma('journal_mode = WAL');
 
 import { intToIP, IPtoInt } from '#lib/ip_utils.js';
@@ -107,12 +107,12 @@ export function addNote(type: NoteType, title?: string, url?: string, body?: str
     return { success: true, code: 201 };
 }
 
-export async function getNetwork(ip: number | string): Promise<{ 
+export async function getNetwork(ip: number | string): Promise<{
     success: boolean;
     reason?: string;
     network?: Network;
     datacenter_ids?: number[]
- }> {
+}> {
     let ip_int: number;
     let ip_str: string;
 
@@ -156,8 +156,8 @@ export async function getNetwork(ip: number | string): Promise<{
 
     const data = await fetch(`https://networksdb.io/api/ip-info?${params}`, { method: 'GET', headers: { 'X-Api-Key': NETWORKSDB_API } }).then((res) => res.json()).catch((err) => {
         console.log('Error fetching from networksdb');
-            console.error(err)
-        })
+        console.error(err)
+    })
 
     if (!data) {
         console.log('data is undefined');
@@ -490,7 +490,7 @@ export async function getDatacenterAerialImage(id: number): Promise<string | nul
         updateDatacenterFilename(id, res.filename);
 
         return res.filename;
-    } catch(err) {
+    } catch (err) {
         console.error(`Error fetching coordinates of ${id}`);
         console.error(err);
         return null;

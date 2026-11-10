@@ -76,7 +76,14 @@ You can preview the production build with `npm run preview`.
 
 ## Deploying
 
-Using `pm2`, create an `ecosystem.config.cjs` file with the following:
+Using Docker:
+
+```sh
+cp .env.local .env
+docker compose up -d --build
+```
+
+Alternatively, using `pm2`, create an `ecosystem.config.cjs` file with the following:
 
 ```js
 module.exports = {

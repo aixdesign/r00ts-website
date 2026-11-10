@@ -1,8 +1,11 @@
+import path from 'path';
+
 import Database from 'better-sqlite3';
 
+import { DB_DIR } from '$app/env/private';
 import type { Facility, PeeringNetwork } from '#lib/types.js';
 
-const peeringdb = new Database('peeringdb.sqlite3');
+const peeringdb = new Database(path.join(DB_DIR, 'peeringdb.sqlite3'));
 
 export function getFacilitiesFromASN(asn: number): Facility[] {
     if (asn < 0)

@@ -1,0 +1,25 @@
+services:
+  site:
+    build: .
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:3000:3000
+    volumes:
+      - peeringdb:/data
+      - aerial:/aerial
+    environment:
+      DB_DIR: /data
+      AERIAL_DIR: /aerial
+    env_file: .env
+    depends_on:
+      db: 
+        condition: service_completed_successfully
+
+  db:
+    build: db/
+    volumes:
+      - peeringdb:/data
+
+volumes:
+  peeringdb:
+  aerial:
